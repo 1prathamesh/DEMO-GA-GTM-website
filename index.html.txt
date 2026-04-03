@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script>
+window.dataLayer = window.dataLayer || [];
+</script>
+
+<!-- PUT YOUR GTM ID -->
+<script>
+(function(w,d,s,l,i){
+w[l]=w[l]||[];
+w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s);
+j.async=true;
+j.src='https://www.googletagmanager.com/gtm.js?id='+i;
+f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');
+</script>
+
+</head>
+
+<body>
+
+<h2>🛒 Store</h2>
+<div id="products"></div>
+
+<button onclick="purchase()">Buy Now</button>
+
+<script>
+
+fetch('/products')
+.then(res => res.json())
+.then(data => {
+  data.forEach(p => {
+    const btn = document.createElement("button");
+    btn.innerText = "Add " + p.name;
+    btn.onclick = () => addToCart(p);
+    document.body.appendChild(btn);
+  });
+});
+
+function addToCart(p){
+  fetch('/cart',{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(p)
+  })
+  .then(res=>res.json())
+  .then(res=>{
+    dataLayer.push(res.dataLayer);
+    console.log(res.dataLayer);
+  });
+}
+
+function purchase(){
+  fetch('/purchase',{method:"POST"})
+  .then(res=>res.json())
+  .then(res=>{
+    dataLayer.push(res.dataLayer);
+  });
+}
+
+</script>
+
+</body>
+</html>
