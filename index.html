@@ -3,7 +3,7 @@
 <head>
   <title>ShopZone</title>
 
-  <!-- Google Tag Manager -->
+  <!-- GTM -->
   <script>
   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -11,15 +11,14 @@
   'https://www.googletagmanager.com/gtm.js?id=GTM-MGVPFTRP'+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-MGVPFTRP');
   </script>
-  <!-- End Google Tag Manager -->
 
   <script>
     window.dataLayer = window.dataLayer || [];
   </script>
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-body { background:#f8f9fa; }
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial; }
+body { background:#f5f5f5; }
 
 /* NAV */
 .nav {
@@ -28,73 +27,59 @@ body { background:#f8f9fa; }
   padding:15px 40px;
   display:flex;
   justify-content:space-between;
-  align-items:center;
 }
 .nav button {
   background:#ff6b00;
   border:none;
-  padding:8px 16px;
+  padding:8px;
   color:white;
-  border-radius:5px;
-  cursor:pointer;
   margin-left:10px;
+  cursor:pointer;
 }
 
 /* HERO */
 .hero {
-  background: linear-gradient(135deg,#000,#333);
+  background: linear-gradient(135deg,#000,#444);
   color:white;
-  padding:60px 40px;
   text-align:center;
+  padding:50px;
 }
 
-/* PRODUCTS */
-.container { padding:40px; }
+/* GRID */
+.container { padding:30px; }
 .grid {
   display:grid;
   grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-  gap:25px;
+  gap:20px;
 }
 .card {
   background:white;
+  padding:15px;
   border-radius:10px;
-  padding:20px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
-.price { color:#ff6b00; font-weight:bold; margin-bottom:10px; }
+.card img { width:100%; height:150px; object-fit:cover; border-radius:8px; }
+
+.price { color:#ff6b00; font-weight:bold; }
+
 .card button {
-  width:100%;
-  padding:10px;
+  margin-top:10px;
+  padding:8px;
   border:none;
   background:#111;
   color:white;
-  border-radius:5px;
   cursor:pointer;
 }
 
-/* PAGES */
+/* CART */
 .page { display:none; }
 .active { display:block; }
 
-/* CART */
 .cart-item {
   background:white;
-  padding:15px;
+  padding:10px;
   margin-bottom:10px;
-  border-radius:8px;
   display:flex;
   justify-content:space-between;
-}
-
-.primary-btn {
-  margin-top:20px;
-  padding:12px;
-  width:100%;
-  background:#ff6b00;
-  border:none;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
 }
 </style>
 
@@ -102,13 +87,12 @@ body { background:#f8f9fa; }
 
 <body>
 
-<!-- Google Tag Manager (noscript) -->
+<!-- GTM NOSCRIPT -->
 <noscript>
 <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGVPFTRP"
-height="0" width="0" style="display:none;visibility:hidden"></iframe>
+height="0" width="0" style="display:none"></iframe>
 </noscript>
 
-<!-- NAV -->
 <div class="nav">
   <h2>🛒 ShopZone</h2>
   <div>
@@ -117,135 +101,114 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </div>
 </div>
 
-<!-- HERO -->
 <div class="hero">
   <h1>Upgrade Your Style 🔥</h1>
-  <p>Premium products at unbeatable prices</p>
 </div>
 
-<!-- PRODUCTS -->
 <div id="products" class="container page active">
   <div class="grid" id="product-list"></div>
 </div>
 
-<!-- CART -->
 <div id="cart" class="container page">
-  <h2>Your Cart</h2>
+  <h2>Cart</h2>
   <div id="cart-items"></div>
-  <button class="primary-btn" onclick="goCheckout()">Proceed to Checkout</button>
+  <h3 id="total"></h3>
+  <button onclick="checkout()">Checkout</button>
 </div>
 
-<!-- CHECKOUT -->
 <div id="checkout" class="container page">
   <h2>Checkout</h2>
-  <input placeholder="Name" style="padding:10px;width:100%;margin:10px 0">
-  <button class="primary-btn" onclick="placeOrder()">Place Order</button>
-</div>
-
-<!-- CONFIRM -->
-<div id="confirmation" class="container page">
-  <h2>✅ Order Successful!</h2>
+  <button onclick="purchase()">Place Order</button>
 </div>
 
 <script>
 
 let cart = [];
+let liked = [];
 
 // PAGE SWITCH
-function showPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(page).classList.add('active');
-}
-
-// UPDATE CART COUNT
-function updateCartCount(){
-  document.getElementById("cart-count").innerText = cart.length;
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById(p).classList.add('active');
 }
 
 // LOAD PRODUCTS
 fetch('/products')
 .then(res=>res.json())
 .then(data=>{
-  const container = document.getElementById('product-list');
+  const div = document.getElementById("product-list");
 
   data.forEach(p=>{
     const card = document.createElement("div");
     card.className="card";
 
-    card.innerHTML=`
+    card.innerHTML = `
+      <img src="${p.image}">
       <h3>${p.name}</h3>
       <p class="price">₹${p.price}</p>
-      <button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+      <button onclick='addToCart(${JSON.stringify(p)})'>Add</button>
+      <button onclick='like(${p.id})'>❤️</button>
     `;
 
-    container.appendChild(card);
+    div.appendChild(card);
 
-    dataLayer.push({
-      event:"view_item",
-      ecommerce:{items:[p]}
-    });
+    dataLayer.push({event:"view_item", ecommerce:{items:[p]}});
   });
 });
 
 // ADD TO CART
 function addToCart(p){
   cart.push(p);
-
-  updateCartCount();
+  document.getElementById("cart-count").innerText = cart.length;
 
   dataLayer.push({
     event:"add_to_cart",
     ecommerce:{value:p.price,items:[p]}
   });
+}
 
-  alert("Added to cart");
+// LIKE
+function like(id){
+  if(!liked.includes(id)){
+    liked.push(id);
+    alert("Liked ❤️");
+  }
 }
 
 // OPEN CART
 function openCart(){
   showPage('cart');
 
-  const div=document.getElementById('cart-items');
+  let total=0;
+  const div = document.getElementById("cart-items");
   div.innerHTML="";
-
-  let total = 0;
 
   cart.forEach(p=>{
     total += p.price;
-
-    const el=document.createElement("div");
+    const el = document.createElement("div");
     el.className="cart-item";
-    el.innerHTML=`<span>${p.name}</span><span>₹${p.price}</span>`;
+    el.innerHTML = `<span>${p.name}</span><span>₹${p.price}</span>`;
     div.appendChild(el);
   });
 
-  const totalEl = document.createElement("h3");
-  totalEl.innerText = "Total: ₹" + total;
-  div.appendChild(totalEl);
+  document.getElementById("total").innerText = "Total: ₹" + total;
 
-  dataLayer.push({
-    event:"view_cart",
-    ecommerce:{items:cart}
-  });
+  dataLayer.push({event:"view_cart", ecommerce:{items:cart}});
 }
 
 // CHECKOUT
-function goCheckout(){
+function checkout(){
   showPage('checkout');
-
-  dataLayer.push({
-    event:"begin_checkout",
-    ecommerce:{items:cart}
-  });
+  dataLayer.push({event:"begin_checkout", ecommerce:{items:cart}});
 }
 
 // PURCHASE
-function placeOrder(){
+function purchase(){
   fetch('/purchase',{method:"POST"})
   .then(res=>res.json())
   .then(res=>{
     dataLayer.push(res.dataLayer);
-    showPage('confirmation');
+    alert("Order placed!");
   });
 }
 
