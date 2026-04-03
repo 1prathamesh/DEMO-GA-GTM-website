@@ -113,7 +113,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>
   <h2>🛒 ShopZone</h2>
   <div>
     <button onclick="showPage('products')">Products</button>
-    <button onclick="openCart()">Cart</button>
+    <button onclick="openCart()">Cart (<span id="cart-count">0</span>)</button>
   </div>
 </div>
 
@@ -151,9 +151,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>
 
 let cart = [];
 
+// PAGE SWITCH
 function showPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(page).classList.add('active');
+}
+
+// UPDATE CART COUNT
+function updateCartCount(){
+  document.getElementById("cart-count").innerText = cart.length;
 }
 
 // LOAD PRODUCTS
@@ -174,7 +180,6 @@ fetch('/products')
 
     container.appendChild(card);
 
-    // view_item
     dataLayer.push({
       event:"view_item",
       ecommerce:{items:[p]}
@@ -185,6 +190,8 @@ fetch('/products')
 // ADD TO CART
 function addToCart(p){
   cart.push(p);
+
+  updateCartCount();
 
   dataLayer.push({
     event:"add_to_cart",
@@ -201,12 +208,20 @@ function openCart(){
   const div=document.getElementById('cart-items');
   div.innerHTML="";
 
+  let total = 0;
+
   cart.forEach(p=>{
+    total += p.price;
+
     const el=document.createElement("div");
     el.className="cart-item";
     el.innerHTML=`<span>${p.name}</span><span>₹${p.price}</span>`;
     div.appendChild(el);
   });
+
+  const totalEl = document.createElement("h3");
+  totalEl.innerText = "Total: ₹" + total;
+  div.appendChild(totalEl);
 
   dataLayer.push({
     event:"view_cart",
