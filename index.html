@@ -1,65 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pro Ecommerce Store</title>
+  <title>ShopZone</title>
 
-<script>
-window.dataLayer = window.dataLayer || [];
-</script>
+  <!-- Google Tag Manager -->
+  <script>
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id=GTM-MGVPFTRP'+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-MGVPFTRP');
+  </script>
+  <!-- End Google Tag Manager -->
 
-<!-- PUT YOUR GTM ID -->
-<script>
-(function(w,d,s,l,i){
-w[l]=w[l]||[];
-w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s);
-j.async=true;
-j.src='https://www.googletagmanager.com/gtm.js?id='+i;
-f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-XXXXXXX');
-</script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+  </script>
 
 <style>
-body { font-family: Arial; padding: 20px; }
-button { margin: 5px; padding: 8px; }
-.page { display: none; }
-.active { display: block; }
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+body { background:#f8f9fa; }
+
+/* NAV */
+.nav {
+  background:#111;
+  color:#fff;
+  padding:15px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.nav button {
+  background:#ff6b00;
+  border:none;
+  padding:8px 16px;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
+  margin-left:10px;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg,#000,#333);
+  color:white;
+  padding:60px 40px;
+  text-align:center;
+}
+
+/* PRODUCTS */
+.container { padding:40px; }
+.grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
+}
+.card {
+  background:white;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+.price { color:#ff6b00; font-weight:bold; margin-bottom:10px; }
+.card button {
+  width:100%;
+  padding:10px;
+  border:none;
+  background:#111;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+/* PAGES */
+.page { display:none; }
+.active { display:block; }
+
+/* CART */
+.cart-item {
+  background:white;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.primary-btn {
+  margin-top:20px;
+  padding:12px;
+  width:100%;
+  background:#ff6b00;
+  border:none;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
 </style>
 
 </head>
 
 <body>
 
-<h2>🛒 My Store</h2>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGVPFTRP"
+height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
 
 <!-- NAV -->
-<button onclick="showPage('products')">Products</button>
-<button onclick="showPage('cart')">Cart</button>
-
-<!-- PRODUCTS PAGE -->
-<div id="products" class="page active"></div>
-
-<!-- CART PAGE -->
-<div id="cart" class="page"></div>
-
-<!-- CHECKOUT PAGE -->
-<div id="checkout" class="page">
-  <h3>Checkout</h3>
-  <input placeholder="Name"><br><br>
-  <button onclick="placeOrder()">Place Order</button>
+<div class="nav">
+  <h2>🛒 ShopZone</h2>
+  <div>
+    <button onclick="showPage('products')">Products</button>
+    <button onclick="openCart()">Cart</button>
+  </div>
 </div>
 
-<!-- CONFIRMATION -->
-<div id="confirmation" class="page">
-  <h3>✅ Order Placed!</h3>
+<!-- HERO -->
+<div class="hero">
+  <h1>Upgrade Your Style 🔥</h1>
+  <p>Premium products at unbeatable prices</p>
+</div>
+
+<!-- PRODUCTS -->
+<div id="products" class="container page active">
+  <div class="grid" id="product-list"></div>
+</div>
+
+<!-- CART -->
+<div id="cart" class="container page">
+  <h2>Your Cart</h2>
+  <div id="cart-items"></div>
+  <button class="primary-btn" onclick="goCheckout()">Proceed to Checkout</button>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout" class="container page">
+  <h2>Checkout</h2>
+  <input placeholder="Name" style="padding:10px;width:100%;margin:10px 0">
+  <button class="primary-btn" onclick="placeOrder()">Place Order</button>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirmation" class="container page">
+  <h2>✅ Order Successful!</h2>
 </div>
 
 <script>
 
 let cart = [];
 
-// PAGE SWITCH
 function showPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(page).classList.add('active');
@@ -69,22 +160,24 @@ function showPage(page){
 fetch('/products')
 .then(res=>res.json())
 .then(data=>{
-  const div = document.getElementById('products');
+  const container = document.getElementById('product-list');
 
   data.forEach(p=>{
-    const el = document.createElement("div");
+    const card = document.createElement("div");
+    card.className="card";
 
-    el.innerHTML = `
-      <p>${p.name} - ₹${p.price}</p>
+    card.innerHTML=`
+      <h3>${p.name}</h3>
+      <p class="price">₹${p.price}</p>
       <button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
     `;
 
-    div.appendChild(el);
+    container.appendChild(card);
 
     // view_item
     dataLayer.push({
-      event: "view_item",
-      ecommerce: { items: [p] }
+      event:"view_item",
+      ecommerce:{items:[p]}
     });
   });
 });
@@ -94,35 +187,30 @@ function addToCart(p){
   cart.push(p);
 
   dataLayer.push({
-    event: "add_to_cart",
-    ecommerce: {
-      value: p.price,
-      items: [p]
-    }
+    event:"add_to_cart",
+    ecommerce:{value:p.price,items:[p]}
   });
 
   alert("Added to cart");
 }
 
-// CART PAGE
-function renderCart(){
-  const div = document.getElementById('cart');
-  div.innerHTML = "<h3>Cart</h3>";
+// OPEN CART
+function openCart(){
+  showPage('cart');
+
+  const div=document.getElementById('cart-items');
+  div.innerHTML="";
 
   cart.forEach(p=>{
-    const el = document.createElement("p");
-    el.innerText = p.name;
+    const el=document.createElement("div");
+    el.className="cart-item";
+    el.innerHTML=`<span>${p.name}</span><span>₹${p.price}</span>`;
     div.appendChild(el);
   });
 
-  const btn = document.createElement("button");
-  btn.innerText = "Checkout";
-  btn.onclick = goCheckout;
-  div.appendChild(btn);
-
   dataLayer.push({
-    event: "view_cart",
-    ecommerce: { items: cart }
+    event:"view_cart",
+    ecommerce:{items:cart}
   });
 }
 
@@ -131,8 +219,8 @@ function goCheckout(){
   showPage('checkout');
 
   dataLayer.push({
-    event: "begin_checkout",
-    ecommerce: { items: cart }
+    event:"begin_checkout",
+    ecommerce:{items:cart}
   });
 }
 
@@ -145,12 +233,6 @@ function placeOrder(){
     showPage('confirmation');
   });
 }
-
-// CART PAGE LOAD
-document.querySelector("button:nth-child(3)").onclick = () => {
-  renderCart();
-  showPage('cart');
-};
 
 </script>
 
