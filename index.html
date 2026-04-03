@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Pro Ecommerce Store</title>
 
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -19,48 +20,137 @@ f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-XXXXXXX');
 </script>
 
+<style>
+body { font-family: Arial; padding: 20px; }
+button { margin: 5px; padding: 8px; }
+.page { display: none; }
+.active { display: block; }
+</style>
+
 </head>
 
 <body>
 
-<h2>🛒 Store</h2>
-<div id="products"></div>
+<h2>🛒 My Store</h2>
 
-<button onclick="purchase()">Buy Now</button>
+<!-- NAV -->
+<button onclick="showPage('products')">Products</button>
+<button onclick="showPage('cart')">Cart</button>
+
+<!-- PRODUCTS PAGE -->
+<div id="products" class="page active"></div>
+
+<!-- CART PAGE -->
+<div id="cart" class="page"></div>
+
+<!-- CHECKOUT PAGE -->
+<div id="checkout" class="page">
+  <h3>Checkout</h3>
+  <input placeholder="Name"><br><br>
+  <button onclick="placeOrder()">Place Order</button>
+</div>
+
+<!-- CONFIRMATION -->
+<div id="confirmation" class="page">
+  <h3>✅ Order Placed!</h3>
+</div>
 
 <script>
 
+let cart = [];
+
+// PAGE SWITCH
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+}
+
+// LOAD PRODUCTS
 fetch('/products')
-.then(res => res.json())
-.then(data => {
-  data.forEach(p => {
-    const btn = document.createElement("button");
-    btn.innerText = "Add " + p.name;
-    btn.onclick = () => addToCart(p);
-    document.body.appendChild(btn);
+.then(res=>res.json())
+.then(data=>{
+  const div = document.getElementById('products');
+
+  data.forEach(p=>{
+    const el = document.createElement("div");
+
+    el.innerHTML = `
+      <p>${p.name} - ₹${p.price}</p>
+      <button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+    `;
+
+    div.appendChild(el);
+
+    // view_item
+    dataLayer.push({
+      event: "view_item",
+      ecommerce: { items: [p] }
+    });
   });
 });
 
+// ADD TO CART
 function addToCart(p){
-  fetch('/cart',{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(p)
-  })
-  .then(res=>res.json())
-  .then(res=>{
-    dataLayer.push(res.dataLayer);
-    console.log(res.dataLayer);
+  cart.push(p);
+
+  dataLayer.push({
+    event: "add_to_cart",
+    ecommerce: {
+      value: p.price,
+      items: [p]
+    }
+  });
+
+  alert("Added to cart");
+}
+
+// CART PAGE
+function renderCart(){
+  const div = document.getElementById('cart');
+  div.innerHTML = "<h3>Cart</h3>";
+
+  cart.forEach(p=>{
+    const el = document.createElement("p");
+    el.innerText = p.name;
+    div.appendChild(el);
+  });
+
+  const btn = document.createElement("button");
+  btn.innerText = "Checkout";
+  btn.onclick = goCheckout;
+  div.appendChild(btn);
+
+  dataLayer.push({
+    event: "view_cart",
+    ecommerce: { items: cart }
   });
 }
 
-function purchase(){
+// CHECKOUT
+function goCheckout(){
+  showPage('checkout');
+
+  dataLayer.push({
+    event: "begin_checkout",
+    ecommerce: { items: cart }
+  });
+}
+
+// PURCHASE
+function placeOrder(){
   fetch('/purchase',{method:"POST"})
   .then(res=>res.json())
   .then(res=>{
     dataLayer.push(res.dataLayer);
+    showPage('confirmation');
   });
 }
+
+// CART PAGE LOAD
+document.querySelector("button:nth-child(3)").onclick = () => {
+  renderCart();
+  showPage('cart');
+};
 
 </script>
 
