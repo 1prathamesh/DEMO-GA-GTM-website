@@ -3,821 +3,820 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShopLab Admin – GTM & GA4 Config</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <title>ShopLab – GTM/GA Practice Store</title>
+
+  <!-- ============================================================
+       🔧 GTM SNIPPET PLACEMENT PRACTICE
+       Replace GTM-XXXXXXX with your real container ID
+       ============================================================ -->
+  <!-- Google Tag Manager (HEAD) — injected dynamically from Admin Panel config -->
+  <script>
+    (function() {
+      var cfg = JSON.parse(localStorage.getItem('shoplab_gtm_config') || '{}');
+      var gtmId = cfg.gtmId || '';
+      if (!gtmId) { console.warn('[GTM] ⚠️ No GTM ID set. Open Admin Panel to configure.'); return; }
+
+      window.dataLayer = window.dataLayer || [];
+
+      if (cfg.gtmMethod === 'paste' && cfg.gtmHeadSnippet) {
+        // Use the exact pasted snippet — inject as script element
+        var tmp = document.createElement('div');
+        tmp.innerHTML = cfg.gtmHeadSnippet;
+        var scripts = tmp.querySelectorAll('script');
+        scripts.forEach(function(s) {
+          var ns = document.createElement('script');
+          if (s.src) { ns.src = s.src; ns.async = true; }
+          else { ns.textContent = s.textContent; }
+          document.head.appendChild(ns);
+        });
+        console.log('[GTM] ✅ Custom pasted snippet injected for:', gtmId);
+      } else {
+        // Auto-generate from ID
+        window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+        var f = document.getElementsByTagName('script')[0];
+        var j = document.createElement('script');
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + gtmId + (cfg.gtmAuth ? '&' + cfg.gtmAuth : '');
+        f.parentNode.insertBefore(j, f);
+        console.log('[GTM] ✅ Container auto-loaded:', gtmId);
+      }
+    })();
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <!-- ============================================================
+       🔧 DATA LAYER INITIALIZATION — Always before GTM snippet!
+       ============================================================ -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    dataLayer.push({
+      event: 'page_context',
+      page_type: 'home',
+      store_name: 'ShopLab',
+      currency: 'INR'
+    });
+    console.log('[dataLayer] Initialized:', dataLayer);
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
   <style>
     :root {
-      --bg: #09090e;
-      --surface: #111118;
-      --card: #16161f;
-      --card2: #1c1c27;
+      --bg: #0d0d0f;
+      --surface: #17171c;
+      --card: #1e1e26;
       --accent: #f0c040;
-      --accent2: #7c6fff;
+      --accent2: #ff6b6b;
+      --text: #f0ede8;
+      --muted: #888;
+      --border: #2a2a35;
       --green: #4ade80;
-      --red: #ff6b6b;
-      --text: #eeeaf4;
-      --muted: #777;
-      --border: #232330;
       --radius: 12px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; }
-
-    /* SIDEBAR */
-    .layout { display: flex; min-height: 100vh; }
-    .sidebar {
-      width: 240px; background: var(--surface); border-right: 1px solid var(--border);
-      padding: 28px 0; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
     }
-    .sidebar-logo { padding: 0 24px 28px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-    .sidebar-logo .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: var(--accent); }
-    .sidebar-logo .logo span { color: var(--text); }
-    .sidebar-logo .sub { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: .05em; text-transform: uppercase; }
-    .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 24px; cursor: pointer; color: var(--muted);
-      font-size: 13px; transition: all .2s; border-left: 3px solid transparent;
+    h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+    /* ---- TOAST ---- */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--card); border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
+      padding: 12px 18px; border-radius: 8px;
+      font-size: 13px; max-width: 320px;
+      opacity: 0; transform: translateY(12px);
+      transition: all .3s; pointer-events: none;
     }
-    .nav-item:hover { color: var(--text); background: var(--card); }
-    .nav-item.active { color: var(--text); background: var(--card); border-left-color: var(--accent); }
-    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
-    .nav-section { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; padding: 16px 24px 6px; }
-    .store-link {
-      margin: 20px 16px 0; background: var(--accent); color: #000;
-      padding: 10px 16px; border-radius: 8px; text-align: center;
-      font-weight: 700; font-family: 'Syne', sans-serif; font-size: 13px;
-      cursor: pointer; text-decoration: none; display: block; transition: opacity .2s;
-    }
-    .store-link:hover { opacity: .85; }
-
-    /* MAIN */
-    .main { flex: 1; padding: 36px 40px; overflow-y: auto; max-width: 900px; }
-    .page-header { margin-bottom: 32px; }
-    .page-header h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-    .page-header p { color: var(--muted); line-height: 1.6; }
-
-    /* TABS */
-    .tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
-    .tab { padding: 9px 18px; cursor: pointer; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; margin-bottom: -1px; }
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* CARDS */
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
-    .card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-    .card-sub { color: var(--muted); font-size: 12px; margin-bottom: 20px; line-height: 1.5; }
-
-    /* FORM */
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 7px; }
-    .form-group input, .form-group textarea, .form-group select {
-      width: 100%; background: var(--card2); border: 1px solid var(--border);
-      color: var(--text); padding: 10px 14px; border-radius: 8px;
-      font-size: 13px; font-family: 'DM Sans', sans-serif; transition: border-color .2s;
-    }
-    .form-group textarea { font-family: 'JetBrains Mono', monospace; font-size: 12px; resize: vertical; min-height: 120px; line-height: 1.6; }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
-    .hint code { background: var(--bg); padding: 1px 5px; border-radius: 4px; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
-
-    /* BUTTONS */
-    .btn-primary { background: var(--accent); color: #000; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-family: 'Syne', sans-serif; font-size: 13px; cursor: pointer; border: none; transition: transform .15s; }
-    .btn-primary:hover { transform: scale(1.03); }
-    .btn-secondary { background: var(--card2); color: var(--text); padding: 10px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); transition: border-color .2s; }
-    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-danger { background: transparent; color: var(--red); padding: 10px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; border: 1px solid #3a1818; transition: background .2s; }
-    .btn-danger:hover { background: #1f0a0a; }
-    .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
-    /* STATUS */
-    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .status-pill.active { background: #0f2e1a; color: var(--green); border: 1px solid #1a4a2a; }
-    .status-pill.inactive { background: #2a1f00; color: var(--accent); border: 1px solid #3a2f00; }
-    .status-pill.error { background: #2a0f0f; color: var(--red); border: 1px solid #3a1818; }
-
-    /* CODE BLOCK */
-    .code-block {
-      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-      padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      color: #a8d8a8; line-height: 1.7; overflow-x: auto; white-space: pre; margin-bottom: 12px;
-    }
-    .code-block .cm { color: var(--muted); }
-    .code-block .kw { color: #7c6fff; }
-    .code-block .st { color: #f0c040; }
-    .code-block .fn { color: #4ade80; }
-
-    /* TOAST */
-    #toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--green); padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transform: translateY(8px); transition: all .3s; pointer-events: none; }
     #toast.show { opacity: 1; transform: translateY(0); }
+    #toast strong { color: var(--green); }
 
-    /* INFO ROW */
-    .info-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-    .info-row:last-child { border-bottom: none; }
-    .info-row .label { color: var(--muted); }
-    .info-row .value { font-family: 'JetBrains Mono', monospace; color: var(--text); font-size: 12px; }
-    .info-row .value.green { color: var(--green); }
-    .info-row .value.yellow { color: var(--accent); }
+    /* ---- DATALAYER PANEL ---- */
+    #dl-panel {
+      position: fixed; top: 0; right: -380px; width: 380px; height: 100vh;
+      background: #10101a; border-left: 1px solid var(--border);
+      z-index: 998; transition: right .35s; overflow-y: auto;
+      padding: 20px;
+    }
+    #dl-panel.open { right: 0; }
+    #dl-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    #dl-panel h4 { color: var(--accent); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+    #dl-close { background: var(--card); border: 1px solid var(--border); color: var(--muted); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #dl-close:hover { color: var(--text); border-color: var(--accent); }
+    .dl-entry {
+      background: var(--card); border-radius: 8px; padding: 12px;
+      margin-bottom: 10px; font-size: 12px; font-family: monospace;
+      border-left: 3px solid var(--accent2);
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .dl-entry .ev-label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 6px; }
 
-    /* CHECKLIST */
-    .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-    .checklist-item:last-child { border-bottom: none; }
-    .check-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
-    .check-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-    .check-desc { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    /* ---- NAV ---- */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,13,15,.92);
+      backdrop-filter: blur(12px); z-index: 100;
+    }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--accent); letter-spacing: -.5px; }
+    .logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s; cursor: pointer; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-right { display: flex; gap: 12px; align-items: center; }
+    .cart-btn {
+      background: var(--accent); color: #000; padding: 8px 18px;
+      border-radius: 8px; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; font-family: 'Syne', sans-serif;
+      transition: transform .15s;
+    }
+    .cart-btn:hover { transform: scale(1.04); }
+    .dl-toggle {
+      background: var(--card); color: var(--accent); padding: 8px 14px;
+      border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid var(--border);
+      font-family: monospace;
+    }
 
-    /* EVENTS TABLE */
-    .events-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .events-table th { text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-    .events-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-    .events-table tr:last-child td { border-bottom: none; }
-    .ev-name { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 12px; }
-    .ev-trigger { color: var(--muted); font-size: 12px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-    .badge.ga4 { background: #0e1f2e; color: #60b0ff; border: 1px solid #1a3a5a; }
-    .badge.custom { background: #1f0e2e; color: #c060ff; border: 1px solid #3a1a5a; }
-    .badge.ecom { background: #0f2e1a; color: var(--green); border: 1px solid #1a4a2a; }
+    /* ---- PAGES ---- */
+    .page { display: none; padding: 40px; }
+    .page.active { display: block; }
 
-    /* PANEL SECTIONS */
-    .section { display: none; }
-    .section.active { display: block; }
+    /* ---- HOME HERO ---- */
+    .hero {
+      text-align: center; padding: 80px 20px 60px;
+      background: radial-gradient(ellipse at 50% 0%, #2a2000 0%, transparent 65%);
+    }
+    .hero-badge { display: inline-block; background: #2a2000; border: 1px solid var(--accent); color: var(--accent); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(36px, 6vw, 72px); font-weight: 800; line-height: 1.05; margin-bottom: 16px; }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p { color: var(--muted); max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: var(--accent); color: #000; padding: 12px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; transition: transform .15s; }
+    .btn-primary:hover { transform: scale(1.04); }
+    .btn-outline { background: transparent; color: var(--text); padding: 12px 28px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: 15px; transition: background .2s; }
+    .btn-outline:hover { background: var(--card); }
+
+    /* ---- CATEGORY CHIPS ---- */
+    .categories { display: flex; gap: 10px; flex-wrap: wrap; margin: 40px 0 24px; }
+    .chip { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all .2s; }
+    .chip:hover, .chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    /* ---- PRODUCT GRID ---- */
+    .section-title { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .product-card {
+      background: var(--card); border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: transform .2s, border-color .2s;
+    }
+    .product-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .product-img {
+      width: 100%; height: 180px; display: flex; align-items: center; justify-content: center;
+      font-size: 56px; background: var(--surface);
+    }
+    .product-body { padding: 16px; }
+    .product-name { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+    .product-brand { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+    .product-footer { display: flex; justify-content: space-between; align-items: center; }
+    .product-price { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); font-size: 17px; }
+    .add-btn { background: var(--accent); color: #000; border: none; padding: 7px 14px; border-radius: 7px; font-weight: 700; cursor: pointer; font-size: 13px; transition: transform .15s; }
+    .add-btn:hover { transform: scale(1.08); }
+    .badge-new { background: var(--accent2); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: 8px; }
+    .badge-sale { background: var(--green); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: 8px; }
+
+    /* ---- PRODUCT DETAIL ---- */
+    .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; }
+    .detail-img { background: var(--card); border-radius: var(--radius); height: 340px; display: flex; align-items: center; justify-content: center; font-size: 100px; }
+    .detail-info { padding: 10px 0; }
+    .detail-info h2 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+    .detail-brand { color: var(--muted); margin-bottom: 12px; }
+    .detail-price { font-size: 32px; font-weight: 800; color: var(--accent); margin-bottom: 16px; font-family: 'Syne', sans-serif; }
+    .detail-desc { color: #aaa; line-height: 1.7; margin-bottom: 24px; }
+    .qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .qty-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 7px; font-size: 18px; cursor: pointer; }
+    .qty-val { font-weight: 700; font-size: 16px; min-width: 24px; text-align: center; }
+    .detail-actions { display: flex; gap: 10px; }
+    .btn-cart { background: var(--accent); color: #000; padding: 12px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; }
+    .btn-wishlist { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; cursor: pointer; font-size: 18px; }
+    .back-link { color: var(--accent); cursor: pointer; font-size: 13px; margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px; }
+
+    /* ---- CART ---- */
+    .cart-empty { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .cart-empty .big { font-size: 64px; margin-bottom: 16px; }
+    .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    .cart-table th { text-align: left; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .cart-table td { padding: 14px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .cart-item-name { font-weight: 600; }
+    .cart-item-brand { color: var(--muted); font-size: 12px; }
+    .remove-btn { background: none; border: none; color: var(--accent2); cursor: pointer; font-size: 18px; }
+    .cart-summary { background: var(--card); border-radius: var(--radius); padding: 24px; max-width: 360px; margin-left: auto; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+    .summary-row.total { font-weight: 700; font-size: 18px; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 12px; }
+    .checkout-btn { width: 100%; background: var(--accent); color: #000; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 16px; margin-top: 16px; transition: transform .15s; }
+    .checkout-btn:hover { transform: scale(1.02); }
+    .coupon-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .coupon-input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 14px; }
+    .coupon-apply { background: var(--card); border: 1px solid var(--border); color: var(--accent); padding: 9px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+
+    /* ---- CHECKOUT ---- */
+    .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+    .form-group input, .form-group select {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+    .order-summary { background: var(--card); border-radius: var(--radius); padding: 24px; }
+    .order-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
+    .place-order-btn { width: 100%; background: var(--accent); color: #000; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 16px; margin-top: 20px; }
+
+    /* ---- CONFIRMATION ---- */
+    #page-confirmation { text-align: center; }
+    .confirm-icon { font-size: 72px; margin-bottom: 20px; }
+    .confirm-id { background: var(--card); display: inline-block; padding: 8px 20px; border-radius: 8px; font-family: monospace; color: var(--accent); font-size: 18px; margin: 12px 0 24px; }
+
+    /* ---- SEARCH ---- */
+    .search-bar-wrap { margin-bottom: 28px; }
+    .search-bar { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; font-size: 15px; font-family: 'DM Sans', sans-serif; }
+    .search-bar:focus { outline: none; border-color: var(--accent); }
+
+    /* ---- INFO BOX ---- */
+    .info-box { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; font-size: 13px; color: #bbb; line-height: 1.7; }
+    .info-box strong { color: var(--accent); }
+    .info-box code { background: var(--surface); padding: 2px 6px; border-radius: 4px; color: var(--text); font-size: 12px; }
 
     @media (max-width: 700px) {
-      .layout { flex-direction: column; }
-      .sidebar { width: 100%; height: auto; position: static; }
-      .main { padding: 24px 18px; }
-      .form-row { grid-template-columns: 1fr; }
+      nav { padding: 12px 20px; }
+      .page { padding: 24px 18px; }
+      .product-detail, .checkout-grid { grid-template-columns: 1fr; }
+      .hero { padding: 50px 16px 40px; }
     }
   </style>
 </head>
 <body>
 
+<!-- ============================================================
+     🔧 GTM BODY SNIPPET — Place immediately after <body> tag
+     ============================================================ -->
+<!-- Google Tag Manager (noscript) — injected dynamically -->
+<script>
+  (function() {
+    var cfg = JSON.parse(localStorage.getItem('shoplab_gtm_config') || '{}');
+    var gtmId = cfg.gtmId || '';
+    if (gtmId) {
+      var ns = document.createElement('noscript');
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.googletagmanager.com/ns.html?id=' + gtmId;
+      iframe.height = '0'; iframe.width = '0';
+      iframe.style.cssText = 'display:none;visibility:hidden';
+      ns.appendChild(iframe);
+      document.body.insertBefore(ns, document.body.firstChild);
+    }
+  })();
+</script>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- dataLayer live panel -->
+<div id="dl-panel">
+  <div id="dl-panel-header">
+    <h4>📦 dataLayer Events</h4>
+    <button id="dl-close" onclick="togglePanel()" title="Close">✕</button>
+  </div>
+  <div id="dl-entries"></div>
+</div>
+
+<!-- TOAST -->
 <div id="toast"></div>
 
-<div class="layout">
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo">Shop<span>Lab</span></div>
-      <div class="sub">Admin Panel</div>
+<!-- NAV -->
+<nav>
+  <div class="logo">Shop<span>Lab</span></div>
+  <div class="nav-links">
+    <a onclick="showPage('home')" class="active" id="nav-home">Home</a>
+    <a onclick="showPage('products')" id="nav-products">Products</a>
+    <a onclick="showPage('cart')" id="nav-cart">Cart (<span id="cart-count">0</span>)</a>
+  </div>
+  <div class="nav-right">
+    <span id="gtm-status-badge" style="font-size:12px;padding:5px 10px;border-radius:6px;font-family:monospace;"></span>
+    <button class="dl-toggle" onclick="togglePanel()">🧪 dataLayer</button>
+    <a href="admin.html" target="_blank" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:8px;font-size:12px;text-decoration:none;">⚙️ Admin</a>
+    <button class="cart-btn" onclick="showPage('cart')">🛒 Cart</button>
+  </div>
+</nav>
+
+<!-- ===================== HOME PAGE ===================== -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">GTM + GA4 Practice Store</div>
+    <h1>Practice <em>Data Layer</em><br>Like a Pro</h1>
+    <p>A fully wired ecommerce demo — every click fires a real dataLayer event. Open the 🧪 panel to inspect them live.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="showPage('products'); pushDL({event:'cta_click', cta_text:'Shop Now', cta_location:'hero'})">Shop Now</button>
+      <button class="btn-outline" onclick="togglePanel()">View dataLayer →</button>
     </div>
-
-    <div class="nav-section">Configuration</div>
-    <div class="nav-item active" onclick="showSection('gtm')"><span class="icon">🏷️</span> GTM Setup</div>
-    <div class="nav-item" onclick="showSection('ga4')"><span class="icon">📊</span> GA4 Setup</div>
-    <div class="nav-item" onclick="showSection('datalayer')"><span class="icon">📦</span> Data Layer</div>
-
-    <div class="nav-section">Reference</div>
-    <div class="nav-item" onclick="showSection('events')"><span class="icon">⚡</span> Events Map</div>
-    <div class="nav-item" onclick="showSection('snippets')"><span class="icon">💻</span> Code Snippets</div>
-    <div class="nav-item" onclick="showSection('checklist')"><span class="icon">✅</span> QA Checklist</div>
-
-    <a href="demo-ecommerce.html" target="_blank" class="store-link">🛒 Open Store →</a>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="main">
-
-    <!-- ═══════════════════════════════════════════
-         SECTION: GTM SETUP
-    ═══════════════════════════════════════════ -->
-    <div id="section-gtm" class="section active">
-      <div class="page-header">
-        <h1>🏷️ GTM Configuration</h1>
-        <p>Paste your GTM snippets directly from GTM dashboard — or just enter your Container ID. Both options auto-inject into the storefront.</p>
-      </div>
-
-      <!-- METHOD TABS -->
-      <div style="display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0">
-        <div id="tab-id" onclick="switchMethod('id')" style="padding:9px 18px;cursor:pointer;font-size:13px;border-bottom:2px solid var(--accent);color:var(--accent);margin-bottom:-1px">Option A: Container ID</div>
-        <div id="tab-paste" onclick="switchMethod('paste')" style="padding:9px 18px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent;color:var(--muted);margin-bottom:-1px">Option B: Paste Full Snippet</div>
-      </div>
-
-      <!-- OPTION A -->
-      <div id="method-id">
-        <div class="card">
-          <div class="card-title">Enter Container ID</div>
-          <div class="card-sub">Find in GTM → Admin → Container Settings. The ID looks like <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-family:monospace;color:var(--accent)">GTM-XXXXXXX</code></div>
-          <div class="form-group">
-            <label>GTM Container ID</label>
-            <input type="text" id="gtm-id" placeholder="GTM-XXXXXXX" />
-            <div class="hint">The store will auto-generate and inject both head and body snippets for you.</div>
-          </div>
-          <div class="form-group">
-            <label>Auth Token (optional — GTM Environments only)</label>
-            <input type="text" id="gtm-auth" placeholder="gtm_auth=XXXXXXX&gtm_preview=env-X" />
-          </div>
-        </div>
-      </div>
-
-      <!-- OPTION B -->
-      <div id="method-paste" style="display:none">
-        <div class="card">
-          <div class="card-title">Paste Your GTM Snippets</div>
-          <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:#bbb;line-height:1.8">
-            📍 <strong style="color:var(--accent)">Where to find snippets in GTM:</strong><br>
-            GTM Dashboard → <strong>Admin</strong> (top nav) → Under "Container" column → <strong>Install Google Tag Manager</strong><br>
-            You'll see two code blocks — copy &amp; paste them below exactly as shown.
-          </div>
-
-          <div class="form-group">
-            <label>① HEAD Snippet — copy the full &lt;script&gt;...&lt;/script&gt; block from GTM</label>
-            <textarea id="gtm-head-snippet" rows="9" spellcheck="false" oninput="autoExtractFromSnippet()" style="font-family:'JetBrains Mono',monospace;font-size:12px" placeholder="Paste the head snippet here...&#10;&#10;Example:&#10;&lt;!-- Google Tag Manager --&gt;&#10;&lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':&#10;new Date().getTime(),event:'gtm.js'});...&#10;})(window,document,'script','dataLayer','GTM-XXXXXXX');&lt;/script&gt;&#10;&lt;!-- End Google Tag Manager --&gt;"></textarea>
-            <div class="hint">Paste exactly as GTM gives it. The Container ID will be extracted automatically.</div>
-          </div>
-
-          <div class="form-group">
-            <label>② BODY Snippet — copy the full &lt;noscript&gt;...&lt;/noscript&gt; block from GTM</label>
-            <textarea id="gtm-body-snippet" rows="5" spellcheck="false" style="font-family:'JetBrains Mono',monospace;font-size:12px" placeholder="Paste the body snippet here...&#10;&#10;Example:&#10;&lt;!-- Google Tag Manager (noscript) --&gt;&#10;&lt;noscript&gt;&lt;iframe src=&quot;https://...&quot; height=&quot;0&quot; width=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/noscript&gt;&#10;&lt;!-- End Google Tag Manager (noscript) --&gt;"></textarea>
-            <div class="hint">Required for users with JavaScript disabled.</div>
-          </div>
-
-          <div id="auto-extract-result" style="display:none;background:#0f2e1a;border:1px solid #1a4a2a;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--green);margin-bottom:4px">
-            ✅ Container ID auto-detected from snippet: <strong id="detected-id"></strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- COMMON OPTIONS + SAVE -->
-      <div class="card">
-        <div class="form-group">
-          <label>Environment</label>
-          <select id="gtm-env">
-            <option value="">Production (default)</option>
-            <option value="staging">Staging / Preview</option>
-            <option value="dev">Development</option>
-          </select>
-        </div>
-        <div class="btn-row">
-          <button class="btn-primary" onclick="saveGTM()">💾 Save & Apply to Store</button>
-          <button class="btn-secondary" onclick="testGTM()">🔍 Open GTM Dashboard</button>
-          <button class="btn-danger" onclick="clearGTM()">🗑 Clear All</button>
-        </div>
-      </div>
-
-      <div class="card" id="gtm-status-card">
-        <div class="card-title">Current Status</div>
-        <div id="gtm-status-rows"></div>
-      </div>
+  <div style="padding: 0 40px 60px;">
+    <div class="info-box">
+      <strong>🎓 Practice Checklist:</strong><br>
+      1. Open <strong>🧪 dataLayer</strong> panel (top right) to see all events in real time.<br>
+      2. Open browser DevTools → Console to see <code>console.log</code> outputs.<br>
+      3. Replace <code>GTM-XXXXXXX</code> in the source with your real container ID.<br>
+      4. In GTM Preview, trigger events and verify variables, triggers &amp; tags fire correctly.<br>
+      5. Check GA4 DebugView to validate events like <code>view_item</code>, <code>add_to_cart</code>, <code>purchase</code>.
     </div>
 
-    <!-- ═
-         SECTION: GA4 SETUP
-    ═══════════════════════════════════════════ -->
-    <div id="section-ga4" class="section">
-      <div class="page-header">
-        <h1>📊 GA4 Configuration</h1>
-        <p>Configure your GA4 Measurement ID and tracking settings for the store.</p>
-      </div>
+    <h2 class="section-title">Featured Products</h2>
+    <p class="section-sub">Click any product to fire a <code>view_item</code> event</p>
+    <div class="product-grid" id="featured-grid"></div>
+  </div>
+</div>
 
-      <div class="card">
-        <div class="card-title">GA4 Measurement ID</div>
-        <div class="card-sub">Your Measurement ID looks like <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-family:monospace;color:var(--accent)">G-XXXXXXXXXX</code>. In GA4 go to Admin → Data Streams → your stream.</div>
-        <div class="form-group">
-          <label>Measurement ID</label>
-          <input type="text" id="ga4-id" placeholder="G-XXXXXXXXXX" />
-          <div class="hint">Used to connect GA4 tags in GTM. You'll create a GA4 Configuration Tag in GTM using this ID.</div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Cookie Domain</label>
-            <input type="text" id="ga4-cookie" placeholder="auto" value="auto" />
-          </div>
-          <div class="form-group">
-            <label>Send Page View</label>
-            <select id="ga4-pageview">
-              <option value="true">Yes (default)</option>
-              <option value="false">No (manual via GTM)</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>User Properties (JSON)</label>
-          <textarea id="ga4-user-props" placeholder='{"store_env": "demo", "currency": "INR"}'></textarea>
-          <div class="hint">Optional. These will be pushed into the dataLayer as user_properties.</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn-primary" onclick="saveGA4()">💾 Save GA4 Settings</button>
-        </div>
-      </div>
+<!-- ===================== PRODUCTS PAGE ===================== -->
+<div id="page-products" class="page">
+  <h2 class="section-title">All Products</h2>
+  <p class="section-sub">Fires <code>view_item_list</code> on page load</p>
 
-      <div class="card">
-        <div class="card-title">🔗 GTM Tag Setup Guide</div>
-        <div class="card-sub">Once you have your GA4 ID, create this tag in GTM:</div>
-        <div class="checklist-item"><div class="check-icon">1️⃣</div><div><div class="check-title">Create a GA4 Configuration Tag</div><div class="check-desc">In GTM → Tags → New → Google Analytics: GA4 Configuration. Enter your Measurement ID. Set trigger to All Pages.</div></div></div>
-        <div class="checklist-item"><div class="check-icon">2️⃣</div><div><div class="check-title">Create Event Tags for each dataLayer event</div><div class="check-desc">Tag type: GA4 Event. Event name: <code style="font-family:monospace;color:var(--accent)">{{Event}}</code>. Trigger: Custom Event matching each event name (e.g. add_to_cart).</div></div></div>
-        <div class="checklist-item"><div class="check-icon">3️⃣</div><div><div class="check-title">Map dataLayer variables</div><div class="check-desc">Create Data Layer Variables in GTM for fields like <code style="font-family:monospace;color:var(--accent)">ecommerce.value</code>, <code style="font-family:monospace;color:var(--accent)">ecommerce.items</code>, etc.</div></div></div>
-        <div class="checklist-item"><div class="check-icon">4️⃣</div><div><div class="check-title">Use GTM Preview to test, then Publish</div><div class="check-desc">Open the store with GTM Preview active. Fire events and verify tags fire with correct data before publishing.</div></div></div>
+  <div class="search-bar-wrap">
+    <input class="search-bar" type="text" placeholder="🔍  Search products… (fires search event)" id="search-input" oninput="handleSearch(this.value)" />
+  </div>
+
+  <div class="categories" id="cat-chips"></div>
+  <div class="product-grid" id="products-grid"></div>
+</div>
+
+<!-- ===================== PRODUCT DETAIL PAGE ===================== -->
+<div id="page-detail" class="page">
+  <div class="back-link" onclick="showPage('products')">← Back to Products</div>
+  <div class="product-detail" id="detail-content"></div>
+</div>
+
+<!-- ===================== CART PAGE ===================== -->
+<div id="page-cart" class="page">
+  <h2 class="section-title">Your Cart</h2>
+  <p class="section-sub">Fires <code>view_cart</code> on page load</p>
+  <div id="cart-content"></div>
+</div>
+
+<!-- ===================== CHECKOUT PAGE ===================== -->
+<div id="page-checkout" class="page">
+  <h2 class="section-title">Checkout</h2>
+  <p class="section-sub">Fires <code>begin_checkout</code> on load · <code>add_payment_info</code> on pay</p>
+  <div class="checkout-grid">
+    <div>
+      <div class="form-group"><label>Full Name</label><input type="text" id="c-name" placeholder="Rahul Sharma" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="c-email" placeholder="rahul@example.com" /></div>
+      <div class="form-group"><label>Phone</label><input type="tel" id="c-phone" placeholder="+91 98765 43210" /></div>
+      <div class="form-group"><label>Address</label><input type="text" id="c-addr" placeholder="123 MG Road" /></div>
+      <div class="form-group"><label>City</label><input type="text" id="c-city" placeholder="Mumbai" /></div>
+      <div class="form-group"><label>Pincode</label><input type="text" id="c-pin" placeholder="400001" /></div>
+      <hr style="border-color:var(--border);margin:20px 0" />
+      <h4 style="margin-bottom:14px;font-size:16px">Payment</h4>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select id="c-payment" onchange="pushDL({event:'add_payment_info', payment_type: this.value, value: cartTotal()})">
+          <option value="">Select…</option>
+          <option value="UPI">UPI</option>
+          <option value="credit_card">Credit Card</option>
+          <option value="debit_card">Debit Card</option>
+          <option value="netbanking">Net Banking</option>
+          <option value="cod">Cash on Delivery</option>
+        </select>
+      </div>
+      <button class="place-order-btn" onclick="placeOrder()">Place Order 🎉</button>
+    </div>
+    <div>
+      <div class="order-summary">
+        <h4 style="margin-bottom:16px">Order Summary</h4>
+        <div id="checkout-items"></div>
+        <hr style="border-color:var(--border);margin:12px 0" />
+        <div class="summary-row total"><span>Total</span><span id="checkout-total"></span></div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- ═══════════════════════════════════════════
-         SECTION: DATA LAYER CONFIG
-    ═══════════════════════════════════════════ -->
-    <div id="section-datalayer" class="section">
-      <div class="page-header">
-        <h1>📦 Data Layer Settings</h1>
-        <p>Configure what gets pushed to the dataLayer on every page and customize event parameters.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Global dataLayer Variables</div>
-        <div class="card-sub">These key-value pairs are pushed to the dataLayer on every page load as part of the page_context event.</div>
-        <div class="form-row">
-          <div class="form-group"><label>Store Name</label><input type="text" id="dl-store" placeholder="ShopLab" /></div>
-          <div class="form-group"><label>Currency</label><input type="text" id="dl-currency" placeholder="INR" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Store Environment</label><select id="dl-env"><option>production</option><option>staging</option><option>development</option></select></div>
-          <div class="form-group"><label>Default Language</label><input type="text" id="dl-lang" placeholder="en-IN" /></div>
-        </div>
-        <div class="form-group">
-          <label>Custom Variables (JSON)</label>
-          <textarea id="dl-custom" placeholder='{"business_unit": "ecommerce", "site_section": "store"}'></textarea>
-          <div class="hint">Any extra key-value pairs to include in every dataLayer push.</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn-primary" onclick="saveDL()">💾 Save Data Layer Config</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Event Toggles</div>
-        <div class="card-sub">Enable or disable specific events being pushed from the store.</div>
-        <div id="event-toggles"></div>
-        <div class="btn-row" style="margin-top:16px">
-          <button class="btn-primary" onclick="saveToggles()">💾 Save Toggles</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════
-         SECTION: EVENTS MAP
-    ═══════════════════════════════════════════ -->
-    <div id="section-events" class="section">
-      <div class="page-header">
-        <h1>⚡ Events Reference Map</h1>
-        <p>Every dataLayer event the store fires, with its trigger and GA4 schema.</p>
-      </div>
-      <div class="card" style="padding:0;overflow:hidden;">
-        <table class="events-table">
-          <thead>
-            <tr><th>Event Name</th><th>Trigger</th><th>Type</th><th>Key Parameters</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><span class="ev-name">page_view</span></td><td class="ev-trigger">Page load (every page)</td><td><span class="badge ga4">GA4</span></td><td class="ev-trigger">page_title, page_path</td></tr>
-            <tr><td><span class="ev-name">page_context</span></td><td class="ev-trigger">First dataLayer init</td><td><span class="badge custom">Custom</span></td><td class="ev-trigger">page_type, store_name, currency</td></tr>
-            <tr><td><span class="ev-name">view_item_list</span></td><td class="ev-trigger">Products page / featured load</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">item_list_id, item_list_name, items[]</td></tr>
-            <tr><td><span class="ev-name">view_item</span></td><td class="ev-trigger">Product detail page open</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">currency, value, items[]</td></tr>
-            <tr><td><span class="ev-name">add_to_cart</span></td><td class="ev-trigger">Click "Add to Cart" button</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">currency, value, items[].quantity</td></tr>
-            <tr><td><span class="ev-name">remove_from_cart</span></td><td class="ev-trigger">Click ✕ in cart</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">currency, value, items[].quantity</td></tr>
-            <tr><td><span class="ev-name">add_to_wishlist</span></td><td class="ev-trigger">Click ♡ wishlist button</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">currency, value, items[]</td></tr>
-            <tr><td><span class="ev-name">view_cart</span></td><td class="ev-trigger">Cart page load</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">currency, value, items[]</td></tr>
-            <tr><td><span class="ev-name">coupon_applied</span></td><td class="ev-trigger">Apply coupon code</td><td><span class="badge custom">Custom</span></td><td class="ev-trigger">coupon_code, cart_value</td></tr>
-            <tr><td><span class="ev-name">begin_checkout</span></td><td class="ev-trigger">Checkout page load</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">currency, value, items[]</td></tr>
-            <tr><td><span class="ev-name">add_payment_info</span></td><td class="ev-trigger">Select payment method</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">payment_type, value</td></tr>
-            <tr><td><span class="ev-name">purchase</span></td><td class="ev-trigger">Place Order button</td><td><span class="badge ecom">Ecom</span></td><td class="ev-trigger">transaction_id, value, tax, items[]</td></tr>
-            <tr><td><span class="ev-name">search</span></td><td class="ev-trigger">Search input (600ms debounce)</td><td><span class="badge ga4">GA4</span></td><td class="ev-trigger">search_term, results_count</td></tr>
-            <tr><td><span class="ev-name">filter_products</span></td><td class="ev-trigger">Category chip click</td><td><span class="badge custom">Custom</span></td><td class="ev-trigger">filter_category, results_count</td></tr>
-            <tr><td><span class="ev-name">cta_click</span></td><td class="ev-trigger">Hero CTA button</td><td><span class="badge custom">Custom</span></td><td class="ev-trigger">cta_text, cta_location</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════
-         SECTION: CODE SNIPPETS
-    ═══════════════════════════════════════════ -->
-    <div id="section-snippets" class="section">
-      <div class="page-header">
-        <h1>💻 Code Snippets</h1>
-        <p>Ready-to-use dataLayer push examples for practice and GTM tag building.</p>
-      </div>
-
-      <div class="tab-bar">
-        <div class="tab active" onclick="switchTab(this,'snip-gtm')">GTM Snippets</div>
-        <div class="tab" onclick="switchTab(this,'snip-dl')">dataLayer Pushes</div>
-        <div class="tab" onclick="switchTab(this,'snip-vars')">GTM Variables</div>
-      </div>
-
-      <div id="snip-gtm" class="tab-content active">
-        <div class="card">
-          <div class="card-title">GTM Head Snippet</div>
-          <div class="card-sub">Place as high as possible in &lt;head&gt;, after dataLayer init.</div>
-          <div class="code-block" id="snippet-head"><!-- paste your GTM ID in the GTM Setup tab first --></div>
-          <button class="btn-secondary" onclick="copyCode('snippet-head')">📋 Copy</button>
-        </div>
-        <div class="card">
-          <div class="card-title">GTM Body Snippet (noscript)</div>
-          <div class="card-sub">Place immediately after the opening &lt;body&gt; tag.</div>
-          <div class="code-block" id="snippet-body"><!-- paste your GTM ID in the GTM Setup tab first --></div>
-          <button class="btn-secondary" onclick="copyCode('snippet-body')">📋 Copy</button>
-        </div>
-        <div class="card">
-          <div class="card-title">dataLayer Initialization</div>
-          <div class="card-sub">MUST appear before the GTM head snippet.</div>
-          <div class="code-block"><span class="cm">// Always initialize dataLayer before GTM loads</span>
-<span class="kw">window</span>.dataLayer = <span class="kw">window</span>.dataLayer || [];
-dataLayer.push({
-  <span class="st">'event'</span>: <span class="st">'page_context'</span>,
-  <span class="st">'page_type'</span>: <span class="st">'home'</span>,
-  <span class="st">'store_name'</span>: <span class="st">'ShopLab'</span>,
-  <span class="st">'currency'</span>: <span class="st">'INR'</span>
-});</div>
-        </div>
-      </div>
-
-      <div id="snip-dl" class="tab-content">
-        <div class="card">
-          <div class="card-title">add_to_cart</div>
-          <div class="code-block">dataLayer.push({
-  <span class="st">'event'</span>: <span class="st">'add_to_cart'</span>,
-  <span class="st">'currency'</span>: <span class="st">'INR'</span>,
-  <span class="st">'value'</span>: 3499,
-  <span class="st">'items'</span>: [{
-    <span class="st">'item_id'</span>: <span class="st">'p001'</span>,
-    <span class="st">'item_name'</span>: <span class="st">'AirSound Pro'</span>,
-    <span class="st">'item_brand'</span>: <span class="st">'SoundX'</span>,
-    <span class="st">'item_category'</span>: <span class="st">'Electronics'</span>,
-    <span class="st">'price'</span>: 3499,
-    <span class="st">'quantity'</span>: 1
-  }]
-});</div>
-        </div>
-        <div class="card">
-          <div class="card-title">purchase</div>
-          <div class="code-block">dataLayer.push({
-  <span class="st">'event'</span>: <span class="st">'purchase'</span>,
-  <span class="st">'transaction_id'</span>: <span class="st">'ORD-ABC123'</span>,
-  <span class="st">'affiliation'</span>: <span class="st">'ShopLab'</span>,
-  <span class="st">'value'</span>: 12999,
-  <span class="st">'tax'</span>: 2340,
-  <span class="st">'shipping'</span>: 0,
-  <span class="st">'currency'</span>: <span class="st">'INR'</span>,
-  <span class="st">'coupon'</span>: <span class="st">''</span>,
-  <span class="st">'items'</span>: [{
-    <span class="st">'item_id'</span>: <span class="st">'p001'</span>,
-    <span class="st">'item_name'</span>: <span class="st">'AirSound Pro'</span>,
-    <span class="st">'price'</span>: 3499,
-    <span class="st">'quantity'</span>: 1
-  }]
-});</div>
-        </div>
-      </div>
-
-      <div id="snip-vars" class="tab-content">
-        <div class="card">
-          <div class="card-title">GTM Data Layer Variables to Create</div>
-          <div class="card-sub">In GTM → Variables → User-Defined Variables → Data Layer Variable</div>
-          <table class="events-table">
-            <thead><tr><th>Variable Name</th><th>Data Layer Variable Name</th><th>Used In</th></tr></thead>
-            <tbody>
-              <tr><td class="ev-name">DLV - Event</td><td class="ev-trigger">event</td><td class="ev-trigger">All triggers</td></tr>
-              <tr><td class="ev-name">DLV - Transaction ID</td><td class="ev-trigger">transaction_id</td><td class="ev-trigger">purchase</td></tr>
-              <tr><td class="ev-name">DLV - Value</td><td class="ev-trigger">value</td><td class="ev-trigger">All ecom events</td></tr>
-              <tr><td class="ev-name">DLV - Currency</td><td class="ev-trigger">currency</td><td class="ev-trigger">All ecom events</td></tr>
-              <tr><td class="ev-name">DLV - Items</td><td class="ev-trigger">items</td><td class="ev-trigger">All ecom events</td></tr>
-              <tr><td class="ev-name">DLV - Search Term</td><td class="ev-trigger">search_term</td><td class="ev-trigger">search</td></tr>
-              <tr><td class="ev-name">DLV - Payment Type</td><td class="ev-trigger">payment_type</td><td class="ev-trigger">add_payment_info</td></tr>
-              <tr><td class="ev-name">DLV - Item List Name</td><td class="ev-trigger">item_list_name</td><td class="ev-trigger">view_item_list</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════
-         SECTION: QA CHECKLIST
-    ═══════════════════════════════════════════ -->
-    <div id="section-checklist" class="section">
-      <div class="page-header">
-        <h1>✅ QA Checklist</h1>
-        <p>Use this checklist during GTM/GA4 implementation QA. Check off items as you verify them.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">GTM Setup</div>
-        <div id="checklist-gtm"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">GA4 Ecommerce Events</div>
-        <div id="checklist-events"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Data Layer Quality</div>
-        <div id="checklist-dl"></div>
-      </div>
-      <div class="btn-row" style="margin-top:8px">
-        <button class="btn-secondary" onclick="resetChecklist()">↺ Reset All</button>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-</div><!-- /layout -->
+<!-- ===================== CONFIRMATION PAGE ===================== -->
+<div id="page-confirmation" class="page">
+  <div class="confirm-icon">✅</div>
+  <h2 class="section-title" style="font-size:32px">Order Placed!</h2>
+  <p style="color:var(--muted);margin:10px 0 4px">Your order ID</p>
+  <div class="confirm-id" id="order-id"></div>
+  <p style="color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.7">A <code style="background:var(--card);padding:2px 6px;border-radius:4px">purchase</code> event has been fired to the dataLayer. Check the 🧪 panel!</p>
+  <button class="btn-primary" onclick="showPage('home')">Continue Shopping</button>
+</div>
 
 <script>
 // =====================================================================
-//  STORAGE KEY
+//  PRODUCT CATALOG
 // =====================================================================
-const STORE_KEY = 'shoplab_gtm_config';
-const TOGGLE_KEY = 'shoplab_event_toggles';
-const CHECK_KEY = 'shoplab_checklist';
+const PRODUCTS = [
+  { id:'p001', name:'AirSound Pro', brand:'SoundX', category:'Electronics', price:3499, emoji:'🎧', desc:'Wireless noise-cancelling headphones with 30hr battery and premium sound profile.', badge:'new' },
+  { id:'p002', name:'UltraWatch S2', brand:'FitPeak', category:'Electronics', price:8999, emoji:'⌚', desc:'Smart fitness watch with health tracking, GPS and 7-day battery life.', badge:'' },
+  { id:'p003', name:'NebulaPad 11', brand:'TechCore', category:'Electronics', price:24999, emoji:'📱', desc:'11-inch tablet with AMOLED display, 8GB RAM and stylus support.', badge:'sale' },
+  { id:'p004', name:'ZeroGravity Chair', brand:'ErgoPro', category:'Furniture', price:12499, emoji:'🪑', desc:'Ergonomic office chair with lumbar support and 4D armrests.', badge:'' },
+  { id:'p005', name:'Flash Runner X', brand:'SpeedStep', category:'Footwear', price:4299, emoji:'👟', desc:'Lightweight running shoe with responsive foam sole and breathable mesh.', badge:'new' },
+  { id:'p006', name:'Brew Master V3', brand:'CaféLab', category:'Appliances', price:5999, emoji:'☕', desc:'Automatic espresso machine with built-in grinder and milk frother.', badge:'' },
+  { id:'p007', name:'SnapShot DSLR', brand:'LensKing', category:'Photography', price:39999, emoji:'📷', desc:'24MP DSLR camera with 4K video, flip screen and dual card slots.', badge:'sale' },
+  { id:'p008', name:'CoolBreeze Fan', brand:'AirFlow', category:'Appliances', price:2199, emoji:'🌬️', desc:'3-speed tower fan with remote, sleep mode and 12hr timer.', badge:'' },
+];
 
-function load() { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
-function save(obj) { localStorage.setItem(STORE_KEY, JSON.stringify({ ...load(), ...obj })); }
+const CATEGORIES = ['All', ...new Set(PRODUCTS.map(p => p.category))];
+
+let cart = [];
+let currentProduct = null;
+let searchTimeout = null;
 
 // =====================================================================
-//  SIDEBAR NAVIGATION
+//  dataLayer PUSH HELPER + UI
 // =====================================================================
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
+function pushDL(obj) {
+  window.dataLayer = window.dataLayer || [];
+  dataLayer.push(obj);
+  console.log('[dataLayer] push →', JSON.stringify(obj, null, 2));
+
+  // Update panel
+  const entry = document.createElement('div');
+  entry.className = 'dl-entry';
+  entry.innerHTML = `<span class="ev-label">${obj.event || '(no event key)'}</span>${JSON.stringify(obj, null, 2).replace(/^{/, '').replace(/}$/, '').trim()}`;
+  const container = document.getElementById('dl-entries');
+  container.insertBefore(entry, container.firstChild);
+
+  showToast(`<strong>${obj.event || 'dataLayer push'}</strong> fired`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function togglePanel() {
+  document.getElementById('dl-panel').classList.toggle('open');
 }
 
 // =====================================================================
-//  TAB SWITCHER
+//  PAGE ROUTING — clean URLs: #home, #products, #cart, #product/p001
 // =====================================================================
-function switchTab(el, id) {
-  const bar = el.closest('.tab-bar');
-  bar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  const parent = bar.nextElementSibling;
-  const container = bar.parentElement;
-  container.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// =====================================================================
-//  GTM — Method switcher (Option A: ID / Option B: Paste)
-// =====================================================================
-let currentMethod = 'id';
-
-function switchMethod(method) {
-  currentMethod = method;
-  document.getElementById('method-id').style.display = method === 'id' ? 'block' : 'none';
-  document.getElementById('method-paste').style.display = method === 'paste' ? 'block' : 'none';
-  const tabId = document.getElementById('tab-id');
-  const tabPaste = document.getElementById('tab-paste');
-  if (method === 'id') {
-    tabId.style.borderBottomColor = 'var(--accent)'; tabId.style.color = 'var(--accent)';
-    tabPaste.style.borderBottomColor = 'transparent'; tabPaste.style.color = 'var(--muted)';
-  } else {
-    tabPaste.style.borderBottomColor = 'var(--accent)'; tabPaste.style.color = 'var(--accent)';
-    tabId.style.borderBottomColor = 'transparent'; tabId.style.color = 'var(--muted)';
-  }
-}
-
-// Auto-extract GTM ID from pasted snippet
-function autoExtractFromSnippet() {
-  const txt = document.getElementById('gtm-head-snippet').value;
-  const match = txt.match(/['"]?(GTM-[A-Z0-9]+)['"]?/);
-  const resultEl = document.getElementById('auto-extract-result');
-  const detectedEl = document.getElementById('detected-id');
-  if (match) {
-    detectedEl.textContent = match[1];
-    resultEl.style.display = 'block';
-  } else {
-    resultEl.style.display = 'none';
-  }
-}
-
-function saveGTM() {
-  const env = document.getElementById('gtm-env').value;
-  let id = '', headSnippet = '', bodySnippet = '', auth = '';
-
-  if (currentMethod === 'id') {
-    id = (document.getElementById('gtm-id').value || '').trim();
-    auth = (document.getElementById('gtm-auth').value || '').trim();
-    if (!id) { showToast('⚠️ Enter a GTM Container ID first', true); return; }
-    if (!id.startsWith('GTM-')) { showToast('⚠️ ID should start with GTM-', true); return; }
-  } else {
-    headSnippet = (document.getElementById('gtm-head-snippet').value || '').trim();
-    bodySnippet = (document.getElementById('gtm-body-snippet').value || '').trim();
-    if (!headSnippet) { showToast('⚠️ Please paste your GTM head snippet', true); return; }
-    const match = headSnippet.match(/['"](GTM-[A-Z0-9]+)['"]/);
-    if (!match) { showToast('⚠️ Could not detect GTM ID in snippet — check the format', true); return; }
-    id = match[1];
-  }
-
-  save({ gtmId: id, gtmEnv: env, gtmAuth: auth, gtmHeadSnippet: headSnippet, gtmBodySnippet: bodySnippet, gtmMethod: currentMethod });
-  updateGTMStatus();
-  updateSnippets();
-  showToast('✅ GTM saved! Reload the store to apply — GTM-ID: ' + id);
-}
-
-function testGTM() {
-  const id = load().gtmId;
-  if (!id) { showToast('⚠️ No GTM ID saved yet', true); return; }
-  window.open('https://tagmanager.google.com/', '_blank');
-}
-
-function clearGTM() {
-  if (!confirm('Clear all GTM settings?')) return;
-  const cfg = load();
-  ['gtmId','gtmEnv','gtmAuth','gtmHeadSnippet','gtmBodySnippet','gtmMethod'].forEach(k => delete cfg[k]);
-  localStorage.setItem(STORE_KEY, JSON.stringify(cfg));
-  document.getElementById('gtm-id').value = '';
-  if (document.getElementById('gtm-auth')) document.getElementById('gtm-auth').value = '';
-  document.getElementById('gtm-head-snippet').value = '';
-  document.getElementById('gtm-body-snippet').value = '';
-  document.getElementById('auto-extract-result').style.display = 'none';
-  updateGTMStatus();
-  updateSnippets();
-  showToast('🗑 GTM config cleared');
-}
-
-function updateGTMStatus() {
-  const cfg = load();
-  const el = document.getElementById('gtm-status-rows');
-  const id = cfg.gtmId || '';
-  el.innerHTML = `
-    <div class="info-row"><span class="label">Container ID</span><span class="value ${id ? 'green' : 'yellow'}">${id || 'Not configured'}</span></div>
-    <div class="info-row"><span class="label">Status</span><span>${id ? '<span class="status-pill active">● Active</span>' : '<span class="status-pill inactive">○ Not Set</span>'}</span></div>
-    <div class="info-row"><span class="label">Environment</span><span class="value">${cfg.gtmEnv || 'production'}</span></div>
-    <div class="info-row"><span class="label">Auth Token</span><span class="value">${cfg.gtmAuth ? '••••••••' : 'None'}</span></div>
-    <div class="info-row"><span class="label">Snippet Injection</span><span class="value ${id ? 'green' : 'yellow'}">${id ? 'Auto ✓' : 'Pending'}</span></div>`;
-}
-
-function updateSnippets() {
-  const id = load().gtmId || 'GTM-XXXXXXX';
-  document.getElementById('snippet-head').innerHTML =
-    `<span class="cm">&lt;!-- Google Tag Manager --&gt;</span>\n` +
-    `<span class="kw">&lt;script&gt;</span>(function(w,d,s,l,i){w[l]=w[l]||[];\nw[l].push({'gtm.start':new Date().getTime(),\nevent:'gtm.js'});\nvar f=d.getElementsByTagName(s)[0],\nj=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';\nj.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;\nf.parentNode.insertBefore(j,f);\n})(window,document,'script','dataLayer','<span class="st">${id}</span>');\n<span class="kw">&lt;/script&gt;</span>\n<span class="cm">&lt;!-- End Google Tag Manager --&gt;</span>`;
-
-  document.getElementById('snippet-body').innerHTML =
-    `<span class="cm">&lt;!-- Google Tag Manager (noscript) --&gt;</span>\n` +
-    `<span class="kw">&lt;noscript&gt;</span>\n  &lt;iframe src="https://www.googletagmanager.com/ns.html?id=<span class="st">${id}</span>"\n  height="0" width="0" style="display:none;visibility:hidden"&gt;\n  &lt;/iframe&gt;\n<span class="kw">&lt;/noscript&gt;</span>\n<span class="cm">&lt;!-- End Google Tag Manager (noscript) --&gt;</span>`;
-}
-
-// =====================================================================
-//  GA4
-// =====================================================================
-function saveGA4() {
-  const id = document.getElementById('ga4-id').value.trim();
-  const cookie = document.getElementById('ga4-cookie').value.trim();
-  const pageview = document.getElementById('ga4-pageview').value;
-  let userProps = {};
-  try { userProps = JSON.parse(document.getElementById('ga4-user-props').value || '{}'); } catch(e) {}
-  save({ ga4Id: id, ga4Cookie: cookie, ga4Pageview: pageview, ga4UserProps: userProps });
-  showToast('✅ GA4 settings saved!');
-}
-
-// =====================================================================
-//  DATA LAYER CONFIG
-// =====================================================================
-function saveDL() {
-  const storeName = document.getElementById('dl-store').value || 'ShopLab';
-  const currency = document.getElementById('dl-currency').value || 'INR';
-  const env = document.getElementById('dl-env').value;
-  const lang = document.getElementById('dl-lang').value || 'en-IN';
-  let custom = {};
-  try { custom = JSON.parse(document.getElementById('dl-custom').value || '{}'); } catch(e) {}
-  save({ dlStoreName: storeName, dlCurrency: currency, dlEnv: env, dlLang: lang, dlCustom: custom });
-  showToast('✅ Data Layer config saved!');
-}
-
-// =====================================================================
-//  EVENT TOGGLES
-// =====================================================================
-const ALL_EVENTS = ['page_view','view_item_list','view_item','add_to_cart','remove_from_cart',
-  'add_to_wishlist','view_cart','begin_checkout','add_payment_info','purchase','search',
-  'filter_products','coupon_applied','cta_click'];
-
-function renderToggles() {
-  const saved = JSON.parse(localStorage.getItem(TOGGLE_KEY) || '{}');
-  document.getElementById('event-toggles').innerHTML = ALL_EVENTS.map(ev => {
-    const on = saved[ev] !== false;
-    return `<div class="info-row">
-      <span class="label" style="font-family:monospace;color:var(--accent)">${ev}</span>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="tog-${ev}" ${on ? 'checked' : ''} style="width:16px;height:16px;accent-color:var(--accent)"/>
-        <span style="font-size:12px;color:var(--muted)">${on ? 'Enabled' : 'Disabled'}</span>
-      </label>
-    </div>`;
-  }).join('');
-}
-
-function saveToggles() {
-  const obj = {};
-  ALL_EVENTS.forEach(ev => { obj[ev] = document.getElementById('tog-'+ev).checked; });
-  localStorage.setItem(TOGGLE_KEY, JSON.stringify(obj));
-  showToast('✅ Event toggles saved!');
-}
-
-// =====================================================================
-//  QA CHECKLIST
-// =====================================================================
-const CHECKLISTS = {
-  gtm: [
-    'GTM container ID is set in Admin Panel',
-    'GTM head snippet appears before </head>',
-    'GTM noscript appears immediately after <body>',
-    'dataLayer is initialized BEFORE the GTM snippet',
-    'GTM Preview mode shows container connected',
-    'No GTM loading errors in browser console',
-    'Container is published after QA is complete'
-  ],
-  events: [
-    'view_item_list fires on Products page load',
-    'view_item fires on product detail open',
-    'add_to_cart fires with correct item data',
-    'remove_from_cart fires when item removed',
-    'view_cart fires on Cart page load',
-    'begin_checkout fires on Checkout page load',
-    'add_payment_info fires on payment selection',
-    'purchase fires on Place Order with transaction_id',
-    'search fires with search_term on input'
-  ],
-  dl: [
-    'items array contains item_id, item_name, price',
-    'currency field is present in all ecom events',
-    'value field matches items × quantity total',
-    'transaction_id is unique per purchase event',
-    'No undefined or null values in dataLayer pushes',
-    'GA4 DebugView shows events in real time'
-  ]
+const PAGE_TITLES = {
+  home: 'ShopLab – Home',
+  products: 'ShopLab – All Products',
+  cart: 'ShopLab – Cart',
+  checkout: 'ShopLab – Checkout',
+  confirmation: 'ShopLab – Order Confirmed'
 };
 
-function renderChecklist() {
-  const saved = JSON.parse(localStorage.getItem(CHECK_KEY) || '{}');
-  ['gtm','events','dl'].forEach(key => {
-    const el = document.getElementById('checklist-' + key);
-    el.innerHTML = CHECKLISTS[key].map((item, i) => {
-      const id = `chk-${key}-${i}`;
-      const checked = saved[id] || false;
-      return `<div class="checklist-item" style="padding:10px 0">
-        <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} onchange="saveCheck('${id}',this.checked)"
-          style="width:16px;height:16px;flex-shrink:0;accent-color:var(--green);margin-top:2px"/>
-        <label for="${id}" style="cursor:pointer;font-size:13px;color:${checked ? 'var(--muted)' : 'var(--text)'};text-decoration:${checked ? 'line-through' : 'none'}">${item}</label>
-      </div>`;
-    }).join('');
+function showPage(page, pushHistory = true) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  const navEl = document.getElementById(`nav-${page}`);
+  if (navEl) navEl.classList.add('active');
+
+  if (page === 'home')       { renderFeatured(); }
+  if (page === 'products')   { renderProducts(PRODUCTS); fireViewItemList(PRODUCTS); }
+  if (page === 'cart')       { renderCart(); fireViewCart(); }
+  if (page === 'checkout')   { renderCheckoutSummary(); fireBeginCheckout(); }
+
+  const hash = `#${page}`;
+  const title = PAGE_TITLES[page] || 'ShopLab';
+  document.title = title;
+
+  if (pushHistory) {
+    history.pushState({ page, productId: null }, title, hash);
+  }
+
+  // Fire virtual page_view for GTM / GA4
+  pushDL({ event: 'page_view', page_title: title, page_path: hash, page_location: window.location.href });
+}
+
+// Listen for browser Back / Forward
+window.addEventListener('popstate', (e) => {
+  const state = e.state;
+  if (!state) { navigateToHash(location.hash, false); return; }
+  if (state.page === 'detail' && state.productId) {
+    const p = PRODUCTS.find(x => x.id === state.productId);
+    if (p) { renderProductDetail(p, '', false); return; }
+  }
+  if (state.page) showPage(state.page, false);
+  else showPage('home', false);
+});
+
+// Route from URL hash on load or navigation
+function navigateToHash(hash, pushHistory = true) {
+  if (!hash || hash === '#' || hash === '#home') { showPage('home', pushHistory); return; }
+  if (hash === '#products') { showPage('products', pushHistory); return; }
+  if (hash === '#cart')     { showPage('cart', pushHistory); return; }
+  if (hash === '#checkout') { showPage('checkout', pushHistory); return; }
+  if (hash.startsWith('#product/')) {
+    const id = hash.replace('#product/', '');
+    const p = PRODUCTS.find(x => x.id === id);
+    if (p) { renderProductDetail(p, 'direct', pushHistory); return; }
+  }
+  showPage('home', pushHistory);
+}
+
+// =====================================================================
+//  RENDER HELPERS
+// =====================================================================
+function productCard(p, listName = '') {
+  return `
+  <div class="product-card" onclick="viewProduct('${p.id}','${listName}')">
+    <div class="product-img">${p.emoji}</div>
+    <div class="product-body">
+      <div class="product-name">${p.name}${p.badge === 'new' ? '<span class="badge-new">NEW</span>' : ''}${p.badge === 'sale' ? '<span class="badge-sale">SALE</span>' : ''}</div>
+      <div class="product-brand">${p.brand} · ${p.category}</div>
+      <div class="product-footer">
+        <div class="product-price">₹${p.price.toLocaleString()}</div>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}', '${listName}')">+ Cart</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFeatured() {
+  const featured = PRODUCTS.slice(0, 4);
+  document.getElementById('featured-grid').innerHTML = featured.map(p => productCard(p, 'featured')).join('');
+  pushDL({ event: 'view_item_list', item_list_id: 'featured', item_list_name: 'Featured Products', items: featured.map(gaItem) });
+}
+
+function renderProducts(list) {
+  document.getElementById('products-grid').innerHTML = list.length
+    ? list.map(p => productCard(p, 'all_products')).join('')
+    : '<p style="color:var(--muted)">No products found.</p>';
+
+  // Category chips
+  document.getElementById('cat-chips').innerHTML = CATEGORIES.map(c =>
+    `<div class="chip" onclick="filterCat('${c}',this)">${c}</div>`
+  ).join('');
+  document.querySelector('.chip').classList.add('active');
+}
+
+function filterCat(cat, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const filtered = cat === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.category === cat);
+  document.getElementById('products-grid').innerHTML = filtered.map(p => productCard(p, 'all_products')).join('');
+  pushDL({ event: 'filter_products', filter_category: cat, results_count: filtered.length });
+  fireViewItemList(filtered);
+}
+
+// =====================================================================
+//  PRODUCT DETAIL
+// =====================================================================
+function viewProduct(id, listName) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  renderProductDetail(p, listName, true);
+}
+
+function renderProductDetail(p, listName, pushHistory) {
+  currentProduct = p;
+  const hash = `#product/${p.id}`;
+  const title = `ShopLab – ${p.name}`;
+  document.title = title;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-img">${p.emoji}</div>
+    <div class="detail-info">
+      <div class="detail-brand">${p.brand} · ${p.category}</div>
+      <h2>${p.name}</h2>
+      <div class="detail-price">₹${p.price.toLocaleString()}</div>
+      <p class="detail-desc">${p.desc}</p>
+      <div class="detail-meta" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">🆔 ${p.id}</span>
+        <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">📂 ${p.category}</span>
+        <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">🏷️ ${p.brand}</span>
+      </div>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="adjustQty(-1)">−</button>
+        <span class="qty-val" id="qty">1</span>
+        <button class="qty-btn" onclick="adjustQty(1)">+</button>
+        <span style="color:var(--muted);font-size:13px">Qty</span>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-cart" onclick="addToCart('${p.id}','detail')">Add to Cart 🛒</button>
+        <button class="btn-wishlist" onclick="addToWishlist('${p.id}')">♡</button>
+      </div>
+      <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--muted);font-family:monospace">
+        🔗 URL: <span style="color:var(--accent)">${hash}</span> &nbsp;|&nbsp; 📦 view_item fired
+      </div>
+    </div>`;
+
+  // Show the detail page
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+
+  if (pushHistory) {
+    history.pushState({ page: 'detail', productId: p.id }, title, hash);
+  } else {
+    history.replaceState({ page: 'detail', productId: p.id }, title, hash);
+  }
+
+  pushDL({
+    event: 'view_item',
+    page_path: hash,
+    page_title: title,
+    item_list_name: listName,
+    currency: 'INR',
+    value: p.price,
+    items: [gaItem(p)]
   });
 }
 
-function saveCheck(id, val) {
-  const saved = JSON.parse(localStorage.getItem(CHECK_KEY) || '{}');
-  saved[id] = val;
-  localStorage.setItem(CHECK_KEY, JSON.stringify(saved));
-  renderChecklist();
+function adjustQty(delta) {
+  const el = document.getElementById('qty');
+  let v = parseInt(el.textContent) + delta;
+  if (v < 1) v = 1;
+  el.textContent = v;
 }
 
-function resetChecklist() {
-  localStorage.removeItem(CHECK_KEY);
-  renderChecklist();
-}
-
-// =====================================================================
-//  UTILS
-// =====================================================================
-function copyCode(id) {
-  const text = document.getElementById(id).innerText;
-  navigator.clipboard.writeText(text).then(() => showToast('📋 Copied to clipboard!'));
-}
-
-function showToast(msg, err = false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.borderLeftColor = err ? 'var(--red)' : 'var(--green)';
-  t.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => t.classList.remove('show'), 3000);
+function addToWishlist(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  pushDL({ event: 'add_to_wishlist', currency: 'INR', value: p.price, items: [gaItem(p)] });
+  showToast('♡ Added to <strong>Wishlist</strong>');
 }
 
 // =====================================================================
-//  INIT — load saved values into form fields
+//  CART
+// =====================================================================
+function addToCart(id, listName = '') {
+  const p = PRODUCTS.find(x => x.id === id);
+  const qty = id === (currentProduct && currentProduct.id) ? parseInt(document.getElementById('qty')?.textContent || 1) : 1;
+  const existing = cart.find(i => i.id === id);
+  if (existing) { existing.qty += qty; } else { cart.push({ ...p, qty }); }
+  updateCartCount();
+  pushDL({ event: 'add_to_cart', currency: 'INR', value: p.price * qty, items: [{ ...gaItem(p), quantity: qty, item_list_name: listName }] });
+}
+
+function removeFromCart(id) {
+  const item = cart.find(i => i.id === id);
+  if (item) {
+    pushDL({ event: 'remove_from_cart', currency: 'INR', value: item.price * item.qty, items: [{ ...gaItem(item), quantity: item.qty }] });
+  }
+  cart = cart.filter(i => i.id !== id);
+  updateCartCount();
+  renderCart();
+}
+
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+
+function cartTotal() {
+  return cart.reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+function renderCart() {
+  const el = document.getElementById('cart-content');
+  if (!cart.length) {
+    el.innerHTML = `<div class="cart-empty"><div class="big">🛒</div><p>Your cart is empty</p></div>`;
+    return;
+  }
+  const rows = cart.map(i => `
+    <tr>
+      <td style="font-size:28px">${i.emoji}</td>
+      <td><div class="cart-item-name">${i.name}</div><div class="cart-item-brand">${i.brand}</div></td>
+      <td>₹${i.price.toLocaleString()}</td>
+      <td>${i.qty}</td>
+      <td>₹${(i.price * i.qty).toLocaleString()}</td>
+      <td><button class="remove-btn" onclick="removeFromCart('${i.id}')">✕</button></td>
+    </tr>`).join('');
+  const total = cartTotal();
+  el.innerHTML = `
+    <table class="cart-table">
+      <thead><tr><th></th><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="cart-summary">
+      <div class="coupon-row">
+        <input class="coupon-input" type="text" id="coupon" placeholder="Enter coupon code" />
+        <button class="coupon-apply" onclick="applyCoupon()">Apply</button>
+      </div>
+      <div class="summary-row"><span>Subtotal</span><span>₹${total.toLocaleString()}</span></div>
+      <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>
+      <div class="summary-row total"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
+      <button class="checkout-btn" onclick="showPage('checkout')">Proceed to Checkout →</button>
+    </div>`;
+}
+
+function applyCoupon() {
+  const code = document.getElementById('coupon').value.trim();
+  pushDL({ event: 'coupon_applied', coupon_code: code, cart_value: cartTotal() });
+}
+
+function renderCheckoutSummary() {
+  document.getElementById('checkout-items').innerHTML = cart.map(i =>
+    `<div class="order-item"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>₹${(i.price*i.qty).toLocaleString()}</span></div>`
+  ).join('');
+  document.getElementById('checkout-total').textContent = `₹${cartTotal().toLocaleString()}`;
+}
+
+function placeOrder() {
+  const orderId = 'ORD-' + Math.random().toString(36).substring(2,9).toUpperCase();
+  const total = cartTotal();
+  const items = cart.map(i => ({ ...gaItem(i), quantity: i.qty }));
+  pushDL({
+    event: 'purchase',
+    transaction_id: orderId,
+    affiliation: 'ShopLab Demo Store',
+    value: total,
+    tax: Math.round(total * 0.18),
+    shipping: 0,
+    currency: 'INR',
+    coupon: '',
+    items
+  });
+  cart = [];
+  updateCartCount();
+  document.getElementById('order-id').textContent = orderId;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-confirmation').classList.add('active');
+}
+
+// =====================================================================
+//  GA4 STANDARD EVENTS
+// =====================================================================
+function fireViewItemList(items) {
+  pushDL({ event: 'view_item_list', item_list_id: 'all_products', item_list_name: 'All Products', items: items.slice(0,8).map(gaItem) });
+}
+
+function fireViewCart() {
+  if (!cart.length) return;
+  pushDL({ event: 'view_cart', currency: 'INR', value: cartTotal(), items: cart.map(i => ({ ...gaItem(i), quantity: i.qty })) });
+}
+
+function fireBeginCheckout() {
+  pushDL({ event: 'begin_checkout', currency: 'INR', value: cartTotal(), items: cart.map(i => ({ ...gaItem(i), quantity: i.qty })) });
+}
+
+// =====================================================================
+//  SEARCH
+// =====================================================================
+function handleSearch(val) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const filtered = PRODUCTS.filter(p =>
+      p.name.toLowerCase().includes(val.toLowerCase()) ||
+      p.brand.toLowerCase().includes(val.toLowerCase()) ||
+      p.category.toLowerCase().includes(val.toLowerCase())
+    );
+    document.getElementById('products-grid').innerHTML = filtered.map(p => productCard(p, 'search')).join('') || '<p style="color:var(--muted)">No results found.</p>';
+    if (val.trim()) {
+      pushDL({ event: 'search', search_term: val.trim(), results_count: filtered.length });
+    }
+  }, 600);
+}
+
+// =====================================================================
+//  GA4 ITEM SCHEMA HELPER
+// =====================================================================
+function gaItem(p, index = 0) {
+  return {
+    item_id: p.id,
+    item_name: p.name,
+    affiliation: 'ShopLab',
+    item_brand: p.brand,
+    item_category: p.category,
+    price: p.price,
+    currency: 'INR',
+    index
+  };
+}
+
+// =====================================================================
+//  INIT
 // =====================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  const cfg = load();
+  // Route to the correct page based on current URL hash
+  navigateToHash(location.hash, false);
 
-  // Restore GTM method
-  if (cfg.gtmMethod === 'paste') {
-    switchMethod('paste');
-    if (cfg.gtmHeadSnippet) document.getElementById('gtm-head-snippet').value = cfg.gtmHeadSnippet;
-    if (cfg.gtmBodySnippet) document.getElementById('gtm-body-snippet').value = cfg.gtmBodySnippet;
-    if (cfg.gtmId) { document.getElementById('detected-id').textContent = cfg.gtmId; document.getElementById('auto-extract-result').style.display = 'block'; }
+  // Show GTM status badge
+  var cfg = JSON.parse(localStorage.getItem('shoplab_gtm_config') || '{}');
+  var badge = document.getElementById('gtm-status-badge');
+  if (cfg.gtmId) {
+    badge.textContent = '✅ ' + cfg.gtmId;
+    badge.style.background = '#0f2e1a';
+    badge.style.color = '#4ade80';
+    badge.style.border = '1px solid #1a4a2a';
   } else {
-    if (cfg.gtmId) document.getElementById('gtm-id').value = cfg.gtmId;
-    if (cfg.gtmAuth) document.getElementById('gtm-auth').value = cfg.gtmAuth;
+    badge.textContent = '⚠️ No GTM ID';
+    badge.style.background = '#2a1f00';
+    badge.style.color = '#f0c040';
+    badge.style.border = '1px solid #3a2f00';
   }
-  if (cfg.gtmEnv) document.getElementById('gtm-env').value = cfg.gtmEnv;
-
-  if (cfg.ga4Id) document.getElementById('ga4-id').value = cfg.ga4Id;
-  if (cfg.ga4Cookie) document.getElementById('ga4-cookie').value = cfg.ga4Cookie;
-  if (cfg.ga4Pageview) document.getElementById('ga4-pageview').value = cfg.ga4Pageview;
-  if (cfg.ga4UserProps) document.getElementById('ga4-user-props').value = JSON.stringify(cfg.ga4UserProps, null, 2);
-  if (cfg.dlStoreName) document.getElementById('dl-store').value = cfg.dlStoreName;
-  if (cfg.dlCurrency) document.getElementById('dl-currency').value = cfg.dlCurrency;
-  if (cfg.dlEnv) document.getElementById('dl-env').value = cfg.dlEnv;
-  if (cfg.dlLang) document.getElementById('dl-lang').value = cfg.dlLang;
-  if (cfg.dlCustom) document.getElementById('dl-custom').value = JSON.stringify(cfg.dlCustom, null, 2);
-
-  updateGTMStatus();
-  updateSnippets();
-  renderToggles();
-  renderChecklist();
 });
 </script>
 </body>
