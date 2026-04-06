@@ -3,12 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShopLab – GTM/GA Practice Store</title>
+  <title>ShopLab – GTM/GA4 Practice Store</title>
 
-  <!-- ============================================================
-       🔧 GTM SNIPPET PLACEMENT PRACTICE
-       Replace GTM-XXXXXXX with your real container ID
-       ============================================================ -->
+  <!-- =====================================================
+       STEP 1: dataLayer initialization
+       MUST be BEFORE the GTM script
+  ====================================================== -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    console.log('[dataLayer] ✅ Initialized');
+  </script>
+
+  <!-- =====================================================
+       STEP 2: GTM Head Snippet
+       Place as high as possible in <head>
+  ====================================================== -->
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -17,218 +26,130 @@
   })(window,document,'script','dataLayer','GTM-MGVPFTRP');</script>
   <!-- End Google Tag Manager -->
 
-  <!-- ============================================================
-       🔧 DATA LAYER INITIALIZATION — Always before GTM snippet!
-       ============================================================ -->
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    dataLayer.push({
-      event: 'page_context',
-      page_type: 'home',
-      store_name: 'ShopLab',
-      currency: 'INR'
-    });
-    console.log('[dataLayer] Initialized:', dataLayer);
-  </script>
-
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --bg: #0d0d0f;
-      --surface: #17171c;
-      --card: #1e1e26;
-      --accent: #f0c040;
-      --accent2: #ff6b6b;
-      --text: #f0ede8;
-      --muted: #888;
-      --border: #2a2a35;
-      --green: #4ade80;
-      --radius: 12px;
+      --bg: #0d0d0f; --surface: #17171c; --card: #1e1e26;
+      --accent: #f0c040; --accent2: #ff6b6b; --text: #f0ede8;
+      --muted: #888; --border: #2a2a35; --green: #4ade80; --radius: 12px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      min-height: 100vh;
-    }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; min-height: 100vh; }
     h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 
-    /* ---- TOAST ---- */
-    #toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 999;
-      background: var(--card); border: 1px solid var(--border);
-      border-left: 4px solid var(--green);
-      padding: 12px 18px; border-radius: 8px;
-      font-size: 13px; max-width: 320px;
-      opacity: 0; transform: translateY(12px);
-      transition: all .3s; pointer-events: none;
-    }
+    #toast { position: fixed; bottom: 24px; right: 24px; z-index: 999; background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--green); padding: 12px 18px; border-radius: 8px; font-size: 13px; max-width: 320px; opacity: 0; transform: translateY(12px); transition: all .3s; pointer-events: none; }
     #toast.show { opacity: 1; transform: translateY(0); }
     #toast strong { color: var(--green); }
 
-    /* ---- DATALAYER PANEL ---- */
-    #dl-panel {
-      position: fixed; top: 0; right: -380px; width: 380px; height: 100vh;
-      background: #10101a; border-left: 1px solid var(--border);
-      z-index: 998; transition: right .35s; overflow-y: auto;
-      padding: 20px;
-    }
+    #dl-panel { position: fixed; top: 0; right: -400px; width: 400px; height: 100vh; background: #10101a; border-left: 1px solid var(--border); z-index: 998; transition: right .35s; overflow-y: auto; padding: 20px; }
     #dl-panel.open { right: 0; }
     #dl-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     #dl-panel h4 { color: var(--accent); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
-    #dl-close { background: var(--card); border: 1px solid var(--border); color: var(--muted); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #dl-close { background: var(--card); border: 1px solid var(--border); color: var(--muted); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
     #dl-close:hover { color: var(--text); border-color: var(--accent); }
-    .dl-entry {
-      background: var(--card); border-radius: 8px; padding: 12px;
-      margin-bottom: 10px; font-size: 12px; font-family: monospace;
-      border-left: 3px solid var(--accent2);
-      white-space: pre-wrap; word-break: break-all;
-    }
-    .dl-entry .ev-label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 6px; }
+    .dl-entry { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 12px; font-family: monospace; border-left: 3px solid var(--accent2); white-space: pre-wrap; word-break: break-all; }
+    .dl-entry .ev-label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 6px; font-size: 13px; }
 
-    /* ---- NAV ---- */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 40px; border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; background: rgba(13,13,15,.92);
-      backdrop-filter: blur(12px); z-index: 100;
-    }
-    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--accent); letter-spacing: -.5px; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(13,13,15,.92); backdrop-filter: blur(12px); z-index: 100; flex-wrap: wrap; gap: 8px; }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--accent); }
     .logo span { color: var(--text); }
     .nav-links { display: flex; gap: 28px; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s; cursor: pointer; }
     .nav-links a:hover, .nav-links a.active { color: var(--text); }
-    .nav-right { display: flex; gap: 12px; align-items: center; }
-    .cart-btn {
-      background: var(--accent); color: #000; padding: 8px 18px;
-      border-radius: 8px; font-weight: 600; font-size: 14px;
-      cursor: pointer; border: none; font-family: 'Syne', sans-serif;
-      transition: transform .15s;
-    }
-    .cart-btn:hover { transform: scale(1.04); }
-    .dl-toggle {
-      background: var(--card); color: var(--accent); padding: 8px 14px;
-      border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid var(--border);
-      font-family: monospace;
-    }
+    .nav-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .cart-btn { background: var(--accent); color: #000; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; font-family: 'Syne', sans-serif; }
+    .dl-toggle { background: var(--card); color: var(--accent); padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); font-family: monospace; }
+    .gtm-badge { font-size: 12px; padding: 5px 10px; border-radius: 6px; font-family: monospace; background: #0f2e1a; color: var(--green); border: 1px solid #1a4a2a; }
 
-    /* ---- PAGES ---- */
     .page { display: none; padding: 40px; }
     .page.active { display: block; }
 
-    /* ---- HOME HERO ---- */
-    .hero {
-      text-align: center; padding: 80px 20px 60px;
-      background: radial-gradient(ellipse at 50% 0%, #2a2000 0%, transparent 65%);
-    }
+    .hero { text-align: center; padding: 80px 20px 60px; background: radial-gradient(ellipse at 50% 0%, #2a2000 0%, transparent 65%); }
     .hero-badge { display: inline-block; background: #2a2000; border: 1px solid var(--accent); color: var(--accent); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
     .hero h1 { font-size: clamp(36px, 6vw, 72px); font-weight: 800; line-height: 1.05; margin-bottom: 16px; }
     .hero h1 em { color: var(--accent); font-style: normal; }
     .hero p { color: var(--muted); max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
     .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary { background: var(--accent); color: #000; padding: 12px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; transition: transform .15s; }
-    .btn-primary:hover { transform: scale(1.04); }
-    .btn-outline { background: transparent; color: var(--text); padding: 12px 28px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: 15px; transition: background .2s; }
-    .btn-outline:hover { background: var(--card); }
+    .btn-primary { background: var(--accent); color: #000; padding: 12px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; }
+    .btn-outline { background: transparent; color: var(--text); padding: 12px 28px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: 15px; }
 
-    /* ---- CATEGORY CHIPS ---- */
     .categories { display: flex; gap: 10px; flex-wrap: wrap; margin: 40px 0 24px; }
     .chip { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all .2s; }
     .chip:hover, .chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-    /* ---- PRODUCT GRID ---- */
     .section-title { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
     .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-    .product-card {
-      background: var(--card); border-radius: var(--radius); overflow: hidden;
-      border: 1px solid var(--border); cursor: pointer;
-      transition: transform .2s, border-color .2s;
-    }
+    .product-card { background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); cursor: pointer; transition: transform .2s, border-color .2s; }
     .product-card:hover { transform: translateY(-4px); border-color: var(--accent); }
-    .product-img {
-      width: 100%; height: 180px; display: flex; align-items: center; justify-content: center;
-      font-size: 56px; background: var(--surface);
-    }
+    .product-img { width: 100%; height: 180px; display: flex; align-items: center; justify-content: center; font-size: 56px; background: var(--surface); }
     .product-body { padding: 16px; }
     .product-name { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
     .product-brand { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
     .product-footer { display: flex; justify-content: space-between; align-items: center; }
     .product-price { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); font-size: 17px; }
-    .add-btn { background: var(--accent); color: #000; border: none; padding: 7px 14px; border-radius: 7px; font-weight: 700; cursor: pointer; font-size: 13px; transition: transform .15s; }
-    .add-btn:hover { transform: scale(1.08); }
+    .add-btn { background: var(--accent); color: #000; border: none; padding: 7px 14px; border-radius: 7px; font-weight: 700; cursor: pointer; font-size: 13px; }
     .badge-new { background: var(--accent2); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: 8px; }
     .badge-sale { background: var(--green); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: 8px; }
 
-    /* ---- PRODUCT DETAIL ---- */
     .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; }
     .detail-img { background: var(--card); border-radius: var(--radius); height: 340px; display: flex; align-items: center; justify-content: center; font-size: 100px; }
     .detail-info { padding: 10px 0; }
     .detail-info h2 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
     .detail-brand { color: var(--muted); margin-bottom: 12px; }
     .detail-price { font-size: 32px; font-weight: 800; color: var(--accent); margin-bottom: 16px; font-family: 'Syne', sans-serif; }
-    .detail-desc { color: #aaa; line-height: 1.7; margin-bottom: 24px; }
+    .detail-desc { color: #aaa; line-height: 1.7; margin-bottom: 20px; }
     .qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
     .qty-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 7px; font-size: 18px; cursor: pointer; }
     .qty-val { font-weight: 700; font-size: 16px; min-width: 24px; text-align: center; }
-    .detail-actions { display: flex; gap: 10px; }
-    .btn-cart { background: var(--accent); color: #000; padding: 12px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; }
+    .detail-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .btn-cart { background: var(--accent); color: #000; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; }
+    .btn-buy  { background: var(--green);  color: #000; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 15px; }
     .btn-wishlist { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; cursor: pointer; font-size: 18px; }
     .back-link { color: var(--accent); cursor: pointer; font-size: 13px; margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px; }
+    .event-info-box { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--muted); font-family: monospace; }
 
-    /* ---- CART ---- */
     .cart-empty { text-align: center; padding: 80px 20px; color: var(--muted); }
     .cart-empty .big { font-size: 64px; margin-bottom: 16px; }
     .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
     .cart-table th { text-align: left; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-    .cart-table td { padding: 14px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .cart-table td { padding: 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     .cart-item-name { font-weight: 600; }
     .cart-item-brand { color: var(--muted); font-size: 12px; }
     .remove-btn { background: none; border: none; color: var(--accent2); cursor: pointer; font-size: 18px; }
     .cart-summary { background: var(--card); border-radius: var(--radius); padding: 24px; max-width: 360px; margin-left: auto; }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
     .summary-row.total { font-weight: 700; font-size: 18px; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 12px; }
-    .checkout-btn { width: 100%; background: var(--accent); color: #000; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 16px; margin-top: 16px; transition: transform .15s; }
-    .checkout-btn:hover { transform: scale(1.02); }
+    .checkout-btn { width: 100%; background: var(--accent); color: #000; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 16px; margin-top: 16px; }
     .coupon-row { display: flex; gap: 8px; margin-bottom: 16px; }
     .coupon-input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 14px; }
     .coupon-apply { background: var(--card); border: 1px solid var(--border); color: var(--accent); padding: 9px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
 
-    /* ---- CHECKOUT ---- */
     .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
-    .form-group input, .form-group select {
-      width: 100%; background: var(--card); border: 1px solid var(--border);
-      color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
-    }
+    .form-group input, .form-group select { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; }
     .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
     .order-summary { background: var(--card); border-radius: var(--radius); padding: 24px; }
     .order-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
     .place-order-btn { width: 100%; background: var(--accent); color: #000; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 16px; margin-top: 20px; }
 
-    /* ---- CONFIRMATION ---- */
     #page-confirmation { text-align: center; }
     .confirm-icon { font-size: 72px; margin-bottom: 20px; }
     .confirm-id { background: var(--card); display: inline-block; padding: 8px 20px; border-radius: 8px; font-family: monospace; color: var(--accent); font-size: 18px; margin: 12px 0 24px; }
 
-    /* ---- SEARCH ---- */
     .search-bar-wrap { margin-bottom: 28px; }
     .search-bar { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; font-size: 15px; font-family: 'DM Sans', sans-serif; }
     .search-bar:focus { outline: none; border-color: var(--accent); }
 
-    /* ---- INFO BOX ---- */
     .info-box { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; font-size: 13px; color: #bbb; line-height: 1.7; }
     .info-box strong { color: var(--accent); }
     .info-box code { background: var(--surface); padding: 2px 6px; border-radius: 4px; color: var(--text); font-size: 12px; }
 
     @media (max-width: 700px) {
-      nav { padding: 12px 20px; }
-      .page { padding: 24px 18px; }
+      nav { padding: 12px 16px; }
+      .page { padding: 20px 16px; }
       .product-detail, .checkout-grid { grid-template-columns: 1fr; }
       .hero { padding: 50px 16px 40px; }
     }
@@ -236,15 +157,15 @@
 </head>
 <body>
 
-<!-- ============================================================
-     🔧 GTM BODY SNIPPET — Place immediately after <body> tag
-     ============================================================ -->
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGVPFTRP"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <!-- =====================================================
+       STEP 3: GTM Body noscript
+       Place IMMEDIATELY after opening <body> tag
+  ====================================================== -->
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGVPFTRP"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
-<!-- dataLayer live panel -->
 <div id="dl-panel">
   <div id="dl-panel-header">
     <h4>📦 dataLayer Events</h4>
@@ -253,10 +174,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="dl-entries"></div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- NAV -->
 <nav>
   <div class="logo">Shop<span>Lab</span></div>
   <div class="nav-links">
@@ -265,84 +184,77 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a onclick="showPage('cart')" id="nav-cart">Cart (<span id="cart-count">0</span>)</a>
   </div>
   <div class="nav-right">
-    <span id="gtm-status-badge" style="font-size:12px;padding:5px 10px;border-radius:6px;font-family:monospace;"></span>
+    <span class="gtm-badge">✅ GTM-MGVPFTRP</span>
     <button class="dl-toggle" onclick="togglePanel()">🧪 dataLayer</button>
     <a href="admin.html" target="_blank" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:8px;font-size:12px;text-decoration:none;">⚙️ Admin</a>
     <button class="cart-btn" onclick="showPage('cart')">🛒 Cart</button>
   </div>
 </nav>
 
-<!-- ===================== HOME PAGE ===================== -->
+<!-- HOME -->
 <div id="page-home" class="page active">
   <div class="hero">
     <div class="hero-badge">GTM + GA4 Practice Store</div>
     <h1>Practice <em>Data Layer</em><br>Like a Pro</h1>
-    <p>A fully wired ecommerce demo — every click fires a real dataLayer event. Open the 🧪 panel to inspect them live.</p>
+    <p>Every click fires a real dataLayer event. Open 🧪 to inspect live.</p>
     <div class="hero-btns">
-      <button class="btn-primary" onclick="showPage('products'); pushDL({event:'cta_click', cta_text:'Shop Now', cta_location:'hero'})">Shop Now</button>
+      <button class="btn-primary" onclick="showPage('products'); pushDL({event:'cta_click', ecommerce:{cta_text:'Shop Now', cta_location:'hero'}})">Shop Now</button>
       <button class="btn-outline" onclick="togglePanel()">View dataLayer →</button>
     </div>
   </div>
-
-  <div style="padding: 0 40px 60px;">
+  <div style="padding:0 0 60px">
     <div class="info-box">
-      <strong>🎓 Practice Checklist:</strong><br>
-      1. Open <strong>🧪 dataLayer</strong> panel (top right) to see all events in real time.<br>
-      2. Open browser DevTools → Console to see <code>console.log</code> outputs.<br>
-      3. Replace <code>GTM-XXXXXXX</code> in the source with your real container ID.<br>
-      4. In GTM Preview, trigger events and verify variables, triggers &amp; tags fire correctly.<br>
-      5. Check GA4 DebugView to validate events like <code>view_item</code>, <code>add_to_cart</code>, <code>purchase</code>.
+      <strong>🎓 Events fired on this store:</strong><br>
+      • <code>view_item_list</code> — products load &nbsp;|&nbsp; <code>view_item</code> — product page opens (reads data-attributes)<br>
+      • <code>add_to_cart</code> — Add to Cart clicked (reads data-attributes dynamically)<br>
+      • <code>purchase</code> — Buy Now or Place Order (random transaction_id generated)<br>
+      • <code>search</code> — search input &nbsp;|&nbsp; <code>begin_checkout</code> — checkout page
     </div>
-
     <h2 class="section-title">Featured Products</h2>
-    <p class="section-sub">Click any product to fire a <code>view_item</code> event</p>
+    <p class="section-sub">Click any product to fire <code>view_item</code></p>
     <div class="product-grid" id="featured-grid"></div>
   </div>
 </div>
 
-<!-- ===================== PRODUCTS PAGE ===================== -->
+<!-- PRODUCTS -->
 <div id="page-products" class="page">
   <h2 class="section-title">All Products</h2>
-  <p class="section-sub">Fires <code>view_item_list</code> on page load</p>
-
+  <p class="section-sub">Fires <code>view_item_list</code> on load</p>
   <div class="search-bar-wrap">
-    <input class="search-bar" type="text" placeholder="🔍  Search products… (fires search event)" id="search-input" oninput="handleSearch(this.value)" />
+    <input class="search-bar" type="text" placeholder="🔍 Search products… (fires search event)" id="search-input" oninput="handleSearch(this.value)" />
   </div>
-
   <div class="categories" id="cat-chips"></div>
   <div class="product-grid" id="products-grid"></div>
 </div>
 
-<!-- ===================== PRODUCT DETAIL PAGE ===================== -->
+<!-- PRODUCT DETAIL -->
 <div id="page-detail" class="page">
   <div class="back-link" onclick="showPage('products')">← Back to Products</div>
   <div class="product-detail" id="detail-content"></div>
 </div>
 
-<!-- ===================== CART PAGE ===================== -->
+<!-- CART -->
 <div id="page-cart" class="page">
   <h2 class="section-title">Your Cart</h2>
-  <p class="section-sub">Fires <code>view_cart</code> on page load</p>
+  <p class="section-sub">Fires <code>view_cart</code> on load</p>
   <div id="cart-content"></div>
 </div>
 
-<!-- ===================== CHECKOUT PAGE ===================== -->
+<!-- CHECKOUT -->
 <div id="page-checkout" class="page">
   <h2 class="section-title">Checkout</h2>
-  <p class="section-sub">Fires <code>begin_checkout</code> on load · <code>add_payment_info</code> on pay</p>
+  <p class="section-sub">Fires <code>begin_checkout</code> on load</p>
   <div class="checkout-grid">
     <div>
-      <div class="form-group"><label>Full Name</label><input type="text" id="c-name" placeholder="Rahul Sharma" /></div>
-      <div class="form-group"><label>Email</label><input type="email" id="c-email" placeholder="rahul@example.com" /></div>
-      <div class="form-group"><label>Phone</label><input type="tel" id="c-phone" placeholder="+91 98765 43210" /></div>
-      <div class="form-group"><label>Address</label><input type="text" id="c-addr" placeholder="123 MG Road" /></div>
-      <div class="form-group"><label>City</label><input type="text" id="c-city" placeholder="Mumbai" /></div>
-      <div class="form-group"><label>Pincode</label><input type="text" id="c-pin" placeholder="400001" /></div>
+      <div class="form-group"><label>Full Name</label><input type="text" placeholder="Rahul Sharma" /></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="rahul@example.com" /></div>
+      <div class="form-group"><label>Phone</label><input type="tel" placeholder="+91 98765 43210" /></div>
+      <div class="form-group"><label>Address</label><input type="text" placeholder="123 MG Road, Mumbai" /></div>
       <hr style="border-color:var(--border);margin:20px 0" />
       <h4 style="margin-bottom:14px;font-size:16px">Payment</h4>
       <div class="form-group">
         <label>Payment Method</label>
-        <select id="c-payment" onchange="pushDL({event:'add_payment_info', payment_type: this.value, value: cartTotal()})">
+        <select id="c-payment" onchange="fireAddPaymentInfo(this.value)">
           <option value="">Select…</option>
           <option value="UPI">UPI</option>
           <option value="credit_card">Credit Card</option>
@@ -364,61 +276,90 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 
-<!-- ===================== CONFIRMATION PAGE ===================== -->
+<!-- CONFIRMATION -->
 <div id="page-confirmation" class="page">
   <div class="confirm-icon">✅</div>
   <h2 class="section-title" style="font-size:32px">Order Placed!</h2>
-  <p style="color:var(--muted);margin:10px 0 4px">Your order ID</p>
+  <p style="color:var(--muted);margin:10px 0 4px">Transaction ID</p>
   <div class="confirm-id" id="order-id"></div>
-  <p style="color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.7">A <code style="background:var(--card);padding:2px 6px;border-radius:4px">purchase</code> event has been fired to the dataLayer. Check the 🧪 panel!</p>
+  <p style="color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.7"><code style="background:var(--card);padding:2px 6px;border-radius:4px">purchase</code> event fired — check the 🧪 panel!</p>
   <button class="btn-primary" onclick="showPage('home')">Continue Shopping</button>
 </div>
 
 <script>
 // =====================================================================
 //  PRODUCT CATALOG
+//  Each product mirrors GA4 ecommerce schema fields
 // =====================================================================
 const PRODUCTS = [
-  { id:'p001', name:'AirSound Pro', brand:'SoundX', category:'Electronics', price:3499, emoji:'🎧', desc:'Wireless noise-cancelling headphones with 30hr battery and premium sound profile.', badge:'new' },
-  { id:'p002', name:'UltraWatch S2', brand:'FitPeak', category:'Electronics', price:8999, emoji:'⌚', desc:'Smart fitness watch with health tracking, GPS and 7-day battery life.', badge:'' },
-  { id:'p003', name:'NebulaPad 11', brand:'TechCore', category:'Electronics', price:24999, emoji:'📱', desc:'11-inch tablet with AMOLED display, 8GB RAM and stylus support.', badge:'sale' },
-  { id:'p004', name:'ZeroGravity Chair', brand:'ErgoPro', category:'Furniture', price:12499, emoji:'🪑', desc:'Ergonomic office chair with lumbar support and 4D armrests.', badge:'' },
-  { id:'p005', name:'Flash Runner X', brand:'SpeedStep', category:'Footwear', price:4299, emoji:'👟', desc:'Lightweight running shoe with responsive foam sole and breathable mesh.', badge:'new' },
-  { id:'p006', name:'Brew Master V3', brand:'CaféLab', category:'Appliances', price:5999, emoji:'☕', desc:'Automatic espresso machine with built-in grinder and milk frother.', badge:'' },
-  { id:'p007', name:'SnapShot DSLR', brand:'LensKing', category:'Photography', price:39999, emoji:'📷', desc:'24MP DSLR camera with 4K video, flip screen and dual card slots.', badge:'sale' },
-  { id:'p008', name:'CoolBreeze Fan', brand:'AirFlow', category:'Appliances', price:2199, emoji:'🌬️', desc:'3-speed tower fan with remote, sleep mode and 12hr timer.', badge:'' },
+  { id:'p001', name:'AirSound Pro',      brand:'SoundX',    category:'Electronics', price:3499,  emoji:'🎧', desc:'Wireless noise-cancelling headphones with 30hr battery.', badge:'new'  },
+  { id:'p002', name:'UltraWatch S2',     brand:'FitPeak',   category:'Electronics', price:8999,  emoji:'⌚', desc:'Smart fitness watch with GPS and 7-day battery life.',    badge:''     },
+  { id:'p003', name:'NebulaPad 11',      brand:'TechCore',  category:'Electronics', price:24999, emoji:'📱', desc:'11-inch AMOLED tablet with 8GB RAM and stylus.',          badge:'sale' },
+  { id:'p004', name:'ZeroGravity Chair', brand:'ErgoPro',   category:'Furniture',   price:12499, emoji:'🪑', desc:'Ergonomic office chair with lumbar support.',             badge:''     },
+  { id:'p005', name:'Flash Runner X',    brand:'SpeedStep', category:'Footwear',    price:4299,  emoji:'👟', desc:'Lightweight running shoe with responsive foam.',          badge:'new'  },
+  { id:'p006', name:'Brew Master V3',    brand:'CaféLab',   category:'Appliances',  price:5999,  emoji:'☕', desc:'Automatic espresso machine with built-in grinder.',      badge:''     },
+  { id:'p007', name:'SnapShot DSLR',     brand:'LensKing',  category:'Photography', price:39999, emoji:'📷', desc:'24MP DSLR with 4K video and dual card slots.',           badge:'sale' },
+  { id:'p008', name:'CoolBreeze Fan',    brand:'AirFlow',   category:'Appliances',  price:2199,  emoji:'🌬️',desc:'3-speed tower fan with remote and 12hr timer.',           badge:''     },
 ];
 
 const CATEGORIES = ['All', ...new Set(PRODUCTS.map(p => p.category))];
-
 let cart = [];
 let currentProduct = null;
 let searchTimeout = null;
 
 // =====================================================================
-//  dataLayer PUSH HELPER + UI
+//  HELPER: Build GA4-compliant item object
+// =====================================================================
+function buildItem(p, quantity, index) {
+  quantity = quantity || 1;
+  index    = index    || 0;
+  return {
+    item_id:       p.id,
+    item_name:     p.name,
+    item_brand:    p.brand,
+    item_category: p.category,
+    price:         p.price,
+    quantity:      quantity,
+    currency:      'INR',
+    index:         index
+  };
+}
+
+// =====================================================================
+//  HELPER: Generate random transaction ID
+// =====================================================================
+function generateTransactionId() {
+  return 'TXN-' + Date.now() + '-' + Math.random().toString(36).substring(2,7).toUpperCase();
+}
+
+// =====================================================================
+//  dataLayer PUSH — correct casing: window.dataLayer (NOT datalayer)
 // =====================================================================
 function pushDL(obj) {
   window.dataLayer = window.dataLayer || [];
-  dataLayer.push(obj);
-  console.log('[dataLayer] push →', JSON.stringify(obj, null, 2));
+  window.dataLayer.push(obj);
 
-  // Update panel
-  const entry = document.createElement('div');
+  // Console debug log for every event
+  console.log('[dataLayer] ✅ Event pushed:', obj.event || '(no event key)');
+  console.log('[dataLayer] Payload:', obj);
+
+  // Live panel UI
+  var entry = document.createElement('div');
   entry.className = 'dl-entry';
-  entry.innerHTML = `<span class="ev-label">${obj.event || '(no event key)'}</span>${JSON.stringify(obj, null, 2).replace(/^{/, '').replace(/}$/, '').trim()}`;
-  const container = document.getElementById('dl-entries');
+  entry.innerHTML = '<span class="ev-label">' + (obj.event || '(no event)') + '</span>' +
+    JSON.stringify(obj, null, 2).replace(/^\{/, '').replace(/\}$/, '').trim();
+  var container = document.getElementById('dl-entries');
   container.insertBefore(entry, container.firstChild);
 
-  showToast(`<strong>${obj.event || 'dataLayer push'}</strong> fired`);
+  showToast('<strong>' + (obj.event || 'dataLayer push') + '</strong> fired');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.innerHTML = msg;
   t.classList.add('show');
-  clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ t.classList.remove('show'); }, 2800);
 }
 
 function togglePanel() {
@@ -426,357 +367,476 @@ function togglePanel() {
 }
 
 // =====================================================================
-//  PAGE ROUTING — clean URLs: #home, #products, #cart, #product/p001
+//  PAGE ROUTING
 // =====================================================================
-const PAGE_TITLES = {
-  home: 'ShopLab – Home',
-  products: 'ShopLab – All Products',
-  cart: 'ShopLab – Cart',
-  checkout: 'ShopLab – Checkout',
+var PAGE_TITLES = {
+  home: 'ShopLab – Home', products: 'ShopLab – All Products',
+  cart: 'ShopLab – Cart', checkout: 'ShopLab – Checkout',
   confirmation: 'ShopLab – Order Confirmed'
 };
 
-function showPage(page, pushHistory = true) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  document.getElementById(`page-${page}`).classList.add('active');
-  const navEl = document.getElementById(`nav-${page}`);
+function showPage(page, pushHistory) {
+  if (pushHistory === undefined) pushHistory = true;
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-links a').forEach(function(a){ a.classList.remove('active'); });
+  document.getElementById('page-' + page).classList.add('active');
+  var navEl = document.getElementById('nav-' + page);
   if (navEl) navEl.classList.add('active');
 
-  if (page === 'home')       { renderFeatured(); }
-  if (page === 'products')   { renderProducts(PRODUCTS); fireViewItemList(PRODUCTS); }
-  if (page === 'cart')       { renderCart(); fireViewCart(); }
-  if (page === 'checkout')   { renderCheckoutSummary(); fireBeginCheckout(); }
+  if (page === 'home')     renderFeatured();
+  if (page === 'products') { renderProducts(PRODUCTS); fireViewItemList(PRODUCTS, 'all_products'); }
+  if (page === 'cart')     { renderCart(); fireViewCart(); }
+  if (page === 'checkout') { renderCheckoutSummary(); fireBeginCheckout(); }
 
-  const hash = `#${page}`;
-  const title = PAGE_TITLES[page] || 'ShopLab';
+  var title = PAGE_TITLES[page] || 'ShopLab';
   document.title = title;
+  if (pushHistory) history.pushState({ page: page, productId: null }, title, '#' + page);
 
-  if (pushHistory) {
-    history.pushState({ page, productId: null }, title, hash);
-  }
-
-  // Fire virtual page_view for GTM / GA4
-  pushDL({ event: 'page_view', page_title: title, page_path: hash, page_location: window.location.href });
+  console.log('[dataLayer] 📄 page_view → ' + page);
+  pushDL({ event: 'page_view', page_title: title, page_path: '#' + page, page_location: window.location.href });
 }
 
-// Listen for browser Back / Forward
-window.addEventListener('popstate', (e) => {
-  const state = e.state;
+window.addEventListener('popstate', function(e) {
+  var state = e.state;
   if (!state) { navigateToHash(location.hash, false); return; }
   if (state.page === 'detail' && state.productId) {
-    const p = PRODUCTS.find(x => x.id === state.productId);
+    var p = PRODUCTS.find(function(x){ return x.id === state.productId; });
     if (p) { renderProductDetail(p, '', false); return; }
   }
   if (state.page) showPage(state.page, false);
   else showPage('home', false);
 });
 
-// Route from URL hash on load or navigation
-function navigateToHash(hash, pushHistory = true) {
+function navigateToHash(hash, pushHistory) {
+  if (pushHistory === undefined) pushHistory = true;
   if (!hash || hash === '#' || hash === '#home') { showPage('home', pushHistory); return; }
   if (hash === '#products') { showPage('products', pushHistory); return; }
   if (hash === '#cart')     { showPage('cart', pushHistory); return; }
   if (hash === '#checkout') { showPage('checkout', pushHistory); return; }
-  if (hash.startsWith('#product/')) {
-    const id = hash.replace('#product/', '');
-    const p = PRODUCTS.find(x => x.id === id);
-    if (p) { renderProductDetail(p, 'direct', pushHistory); return; }
+  if (hash.indexOf('#product/') === 0) {
+    var id = hash.replace('#product/', '');
+    var p  = PRODUCTS.find(function(x){ return x.id === id; });
+    if (p) { renderProductDetail(p, 'direct_url', pushHistory); return; }
   }
   showPage('home', pushHistory);
 }
 
 // =====================================================================
-//  RENDER HELPERS
+//  PRODUCT CARDS — include data-* attributes for dynamic tracking
 // =====================================================================
-function productCard(p, listName = '') {
-  return `
-  <div class="product-card" onclick="viewProduct('${p.id}','${listName}')">
-    <div class="product-img">${p.emoji}</div>
-    <div class="product-body">
-      <div class="product-name">${p.name}${p.badge === 'new' ? '<span class="badge-new">NEW</span>' : ''}${p.badge === 'sale' ? '<span class="badge-sale">SALE</span>' : ''}</div>
-      <div class="product-brand">${p.brand} · ${p.category}</div>
-      <div class="product-footer">
-        <div class="product-price">₹${p.price.toLocaleString()}</div>
-        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}', '${listName}')">+ Cart</button>
-      </div>
-    </div>
-  </div>`;
+function productCard(p, listName) {
+  listName = listName || '';
+  return '<div class="product-card"' +
+    ' data-id="'       + p.id       + '"' +
+    ' data-name="'     + p.name     + '"' +
+    ' data-price="'    + p.price    + '"' +
+    ' data-category="' + p.category + '"' +
+    ' data-brand="'    + p.brand    + '"' +
+    ' data-list="'     + listName   + '"' +
+    ' onclick="viewProduct(\'' + p.id + '\',\'' + listName + '\')">' +
+    '<div class="product-img">' + p.emoji + '</div>' +
+    '<div class="product-body">' +
+      '<div class="product-name">' + p.name +
+        (p.badge === 'new'  ? '<span class="badge-new">NEW</span>'   : '') +
+        (p.badge === 'sale' ? '<span class="badge-sale">SALE</span>' : '') +
+      '</div>' +
+      '<div class="product-brand">' + p.brand + ' · ' + p.category + '</div>' +
+      '<div class="product-footer">' +
+        '<div class="product-price">₹' + p.price.toLocaleString() + '</div>' +
+        '<button class="add-btn"' +
+          ' data-id="'       + p.id       + '"' +
+          ' data-name="'     + p.name     + '"' +
+          ' data-price="'    + p.price    + '"' +
+          ' data-category="' + p.category + '"' +
+          ' data-brand="'    + p.brand    + '"' +
+          ' data-list="'     + listName   + '"' +
+          ' onclick="event.stopPropagation(); addToCartFromBtn(this)">+ Cart</button>' +
+      '</div>' +
+    '</div></div>';
 }
 
 function renderFeatured() {
-  const featured = PRODUCTS.slice(0, 4);
-  document.getElementById('featured-grid').innerHTML = featured.map(p => productCard(p, 'featured')).join('');
-  pushDL({ event: 'view_item_list', item_list_id: 'featured', item_list_name: 'Featured Products', items: featured.map(gaItem) });
+  var featured = PRODUCTS.slice(0, 4);
+  document.getElementById('featured-grid').innerHTML = featured.map(function(p){ return productCard(p, 'featured'); }).join('');
+  fireViewItemList(featured, 'featured');
 }
 
 function renderProducts(list) {
   document.getElementById('products-grid').innerHTML = list.length
-    ? list.map(p => productCard(p, 'all_products')).join('')
+    ? list.map(function(p){ return productCard(p, 'all_products'); }).join('')
     : '<p style="color:var(--muted)">No products found.</p>';
-
-  // Category chips
-  document.getElementById('cat-chips').innerHTML = CATEGORIES.map(c =>
-    `<div class="chip" onclick="filterCat('${c}',this)">${c}</div>`
-  ).join('');
+  document.getElementById('cat-chips').innerHTML = CATEGORIES.map(function(c){
+    return '<div class="chip" onclick="filterCat(\'' + c + '\',this)">' + c + '</div>';
+  }).join('');
   document.querySelector('.chip').classList.add('active');
 }
 
 function filterCat(cat, el) {
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
   el.classList.add('active');
-  const filtered = cat === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.category === cat);
-  document.getElementById('products-grid').innerHTML = filtered.map(p => productCard(p, 'all_products')).join('');
+  var filtered = cat === 'All' ? PRODUCTS : PRODUCTS.filter(function(p){ return p.category === cat; });
+  document.getElementById('products-grid').innerHTML = filtered.map(function(p){ return productCard(p, 'all_products'); }).join('');
+  console.log('[dataLayer] 🏷️ filter_products:', cat);
   pushDL({ event: 'filter_products', filter_category: cat, results_count: filtered.length });
-  fireViewItemList(filtered);
+  fireViewItemList(filtered, 'all_products');
 }
 
 // =====================================================================
-//  PRODUCT DETAIL
+//  EVENT A: view_item
+//  Auto-triggered when product page loads
+//  Reads product data from DOM data-attributes
 // =====================================================================
 function viewProduct(id, listName) {
-  const p = PRODUCTS.find(x => x.id === id);
+  var p = PRODUCTS.find(function(x){ return x.id === id; });
   if (!p) return;
-  renderProductDetail(p, listName, true);
+  renderProductDetail(p, listName || '', true);
 }
 
 function renderProductDetail(p, listName, pushHistory) {
   currentProduct = p;
-  const hash = `#product/${p.id}`;
-  const title = `ShopLab – ${p.name}`;
+  var hash  = '#product/' + p.id;
+  var title = 'ShopLab – ' + p.name;
   document.title = title;
 
-  document.getElementById('detail-content').innerHTML = `
-    <div class="detail-img">${p.emoji}</div>
-    <div class="detail-info">
-      <div class="detail-brand">${p.brand} · ${p.category}</div>
-      <h2>${p.name}</h2>
-      <div class="detail-price">₹${p.price.toLocaleString()}</div>
-      <p class="detail-desc">${p.desc}</p>
-      <div class="detail-meta" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-        <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">🆔 ${p.id}</span>
-        <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">📂 ${p.category}</span>
-        <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">🏷️ ${p.brand}</span>
-      </div>
-      <div class="qty-row">
-        <button class="qty-btn" onclick="adjustQty(-1)">−</button>
-        <span class="qty-val" id="qty">1</span>
-        <button class="qty-btn" onclick="adjustQty(1)">+</button>
-        <span style="color:var(--muted);font-size:13px">Qty</span>
-      </div>
-      <div class="detail-actions">
-        <button class="btn-cart" onclick="addToCart('${p.id}','detail')">Add to Cart 🛒</button>
-        <button class="btn-wishlist" onclick="addToWishlist('${p.id}')">♡</button>
-      </div>
-      <div style="margin-top:20px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--muted);font-family:monospace">
-        🔗 URL: <span style="color:var(--accent)">${hash}</span> &nbsp;|&nbsp; 📦 view_item fired
-      </div>
-    </div>`;
+  // Render product HTML with data-* attributes on every interactive element
+  document.getElementById('detail-content').innerHTML =
+    '<div class="detail-img">' + p.emoji + '</div>' +
+    '<div class="detail-info"' +
+      ' data-id="'       + p.id       + '"' +
+      ' data-name="'     + p.name     + '"' +
+      ' data-price="'    + p.price    + '"' +
+      ' data-category="' + p.category + '"' +
+      ' data-brand="'    + p.brand    + '">' +
+      '<div class="detail-brand">' + p.brand + ' · ' + p.category + '</div>' +
+      '<h2>' + p.name + '</h2>' +
+      '<div class="detail-price">₹' + p.price.toLocaleString() + '</div>' +
+      '<p class="detail-desc">' + p.desc + '</p>' +
+      '<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">' +
+        '<span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">🆔 ' + p.id + '</span>' +
+        '<span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">📂 ' + p.category + '</span>' +
+        '<span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)">🏷️ ' + p.brand + '</span>' +
+      '</div>' +
+      '<div class="qty-row">' +
+        '<button class="qty-btn" onclick="adjustQty(-1)">−</button>' +
+        '<span class="qty-val" id="qty">1</span>' +
+        '<button class="qty-btn" onclick="adjustQty(1)">+</button>' +
+        '<span style="color:var(--muted);font-size:13px">Qty</span>' +
+      '</div>' +
+      '<div class="detail-actions">' +
+        // Add to Cart button — data-* attributes for dynamic tracking
+        '<button class="btn-cart"' +
+          ' data-id="'       + p.id       + '"' +
+          ' data-name="'     + p.name     + '"' +
+          ' data-price="'    + p.price    + '"' +
+          ' data-category="' + p.category + '"' +
+          ' data-brand="'    + p.brand    + '"' +
+          ' onclick="addToCartFromBtn(this)">Add to Cart 🛒</button>' +
+        // Buy Now button — fires purchase event directly
+        '<button class="btn-buy"' +
+          ' data-id="'       + p.id       + '"' +
+          ' data-name="'     + p.name     + '"' +
+          ' data-price="'    + p.price    + '"' +
+          ' data-category="' + p.category + '"' +
+          ' data-brand="'    + p.brand    + '"' +
+          ' onclick="buyNow(this)">Buy Now ⚡</button>' +
+        '<button class="btn-wishlist" onclick="addToWishlist(\'' + p.id + '\')">♡</button>' +
+      '</div>' +
+      '<div class="event-info-box">' +
+        '🔗 URL: <span style="color:var(--accent)">' + hash + '</span> &nbsp;|&nbsp; ' +
+        '📦 <span style="color:var(--green)">view_item</span> fired' +
+      '</div>' +
+    '</div>';
 
-  // Show the detail page
-  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(pg){ pg.classList.remove('active'); });
+  document.querySelectorAll('.nav-links a').forEach(function(a){ a.classList.remove('active'); });
   document.getElementById('page-detail').classList.add('active');
 
-  if (pushHistory) {
-    history.pushState({ page: 'detail', productId: p.id }, title, hash);
-  } else {
-    history.replaceState({ page: 'detail', productId: p.id }, title, hash);
-  }
+  if (pushHistory) history.pushState({ page: 'detail', productId: p.id }, title, hash);
+  else             history.replaceState({ page: 'detail', productId: p.id }, title, hash);
 
+  // Read product info from DOM data-attributes (simulating real-world implementation)
+  var el = document.querySelector('#detail-content .detail-info');
+  var itemFromDOM = {
+    item_id:       el.dataset.id,
+    item_name:     el.dataset.name,
+    item_category: el.dataset.category,
+    item_brand:    el.dataset.brand,
+    price:         parseFloat(el.dataset.price),
+    quantity:      1,
+    currency:      'INR'
+  };
+
+  console.log('[dataLayer] 🛍️ view_item — data read from DOM attributes:', itemFromDOM);
+
+  // EVENT A: view_item
   pushDL({
     event: 'view_item',
-    page_path: hash,
-    page_title: title,
+    page_path:      hash,
+    page_title:     title,
     item_list_name: listName,
-    currency: 'INR',
-    value: p.price,
-    items: [gaItem(p)]
+    ecommerce: {
+      currency: 'INR',
+      value:    parseFloat(el.dataset.price),
+      items:    [itemFromDOM]
+    }
   });
 }
 
 function adjustQty(delta) {
-  const el = document.getElementById('qty');
-  let v = parseInt(el.textContent) + delta;
+  var el = document.getElementById('qty');
+  var v  = parseInt(el.textContent) + delta;
   if (v < 1) v = 1;
   el.textContent = v;
 }
 
+// =====================================================================
+//  EVENT B: add_to_cart
+//  Reads product data dynamically from the clicked button's data-attributes
+// =====================================================================
+function addToCartFromBtn(btn) {
+  var id       = btn.dataset.id;
+  var name     = btn.dataset.name;
+  var price    = parseFloat(btn.dataset.price);
+  var category = btn.dataset.category;
+  var brand    = btn.dataset.brand;
+  var listName = btn.dataset.list || '';
+  var qtyEl    = document.getElementById('qty');
+  var qty      = qtyEl ? parseInt(qtyEl.textContent) : 1;
+
+  // Update cart state
+  var p = PRODUCTS.find(function(x){ return x.id === id; });
+  if (p) {
+    var existing = cart.find(function(i){ return i.id === id; });
+    if (existing) existing.qty += qty;
+    else cart.push(Object.assign({}, p, { qty: qty }));
+    updateCartCount();
+  }
+
+  var itemFromBtn = {
+    item_id:        id,
+    item_name:      name,
+    item_category:  category,
+    item_brand:     brand,
+    price:          price,
+    quantity:       qty,
+    currency:       'INR',
+    item_list_name: listName
+  };
+
+  console.log('[dataLayer] 🛒 add_to_cart — data read from button data-attributes:', itemFromBtn);
+
+  // EVENT B: add_to_cart
+  pushDL({
+    event: 'add_to_cart',
+    ecommerce: {
+      currency: 'INR',
+      value:    price * qty,
+      items:    [itemFromBtn]
+    }
+  });
+}
+
+// =====================================================================
+//  EVENT C: purchase (Buy Now)
+//  Generates random transaction_id, fires purchase event immediately
+// =====================================================================
+function buyNow(btn) {
+  var id       = btn.dataset.id;
+  var name     = btn.dataset.name;
+  var price    = parseFloat(btn.dataset.price);
+  var category = btn.dataset.category;
+  var brand    = btn.dataset.brand;
+  var qtyEl    = document.getElementById('qty');
+  var qty      = qtyEl ? parseInt(qtyEl.textContent) : 1;
+
+  var transactionId = generateTransactionId();
+  var value = price * qty;
+
+  var itemData = {
+    item_id:       id,
+    item_name:     name,
+    item_category: category,
+    item_brand:    brand,
+    price:         price,
+    quantity:      qty,
+    currency:      'INR'
+  };
+
+  console.log('[dataLayer] ⚡ purchase (Buy Now) — transaction_id:', transactionId);
+  console.log('[dataLayer] purchase item:', itemData);
+
+  // EVENT C: purchase
+  pushDL({
+    event: 'purchase',
+    ecommerce: {
+      transaction_id: transactionId,
+      affiliation:    'ShopLab',
+      value:          value,
+      tax:            Math.round(value * 0.18),
+      shipping:       0,
+      currency:       'INR',
+      items:          [itemData]
+    }
+  });
+
+  document.getElementById('order-id').textContent = transactionId;
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-confirmation').classList.add('active');
+}
+
 function addToWishlist(id) {
-  const p = PRODUCTS.find(x => x.id === id);
-  pushDL({ event: 'add_to_wishlist', currency: 'INR', value: p.price, items: [gaItem(p)] });
+  var p = PRODUCTS.find(function(x){ return x.id === id; });
+  console.log('[dataLayer] ♡ add_to_wishlist:', p.name);
+  pushDL({ event: 'add_to_wishlist', ecommerce: { currency: 'INR', value: p.price, items: [buildItem(p)] } });
   showToast('♡ Added to <strong>Wishlist</strong>');
 }
 
 // =====================================================================
-//  CART
+//  CART FUNCTIONS
 // =====================================================================
-function addToCart(id, listName = '') {
-  const p = PRODUCTS.find(x => x.id === id);
-  const qty = id === (currentProduct && currentProduct.id) ? parseInt(document.getElementById('qty')?.textContent || 1) : 1;
-  const existing = cart.find(i => i.id === id);
-  if (existing) { existing.qty += qty; } else { cart.push({ ...p, qty }); }
-  updateCartCount();
-  pushDL({ event: 'add_to_cart', currency: 'INR', value: p.price * qty, items: [{ ...gaItem(p), quantity: qty, item_list_name: listName }] });
-}
-
 function removeFromCart(id) {
-  const item = cart.find(i => i.id === id);
+  var item = cart.find(function(i){ return i.id === id; });
   if (item) {
-    pushDL({ event: 'remove_from_cart', currency: 'INR', value: item.price * item.qty, items: [{ ...gaItem(item), quantity: item.qty }] });
+    console.log('[dataLayer] ❌ remove_from_cart:', item.name);
+    pushDL({ event: 'remove_from_cart', ecommerce: { currency: 'INR', value: item.price * item.qty, items: [buildItem(item, item.qty)] } });
   }
-  cart = cart.filter(i => i.id !== id);
+  cart = cart.filter(function(i){ return i.id !== id; });
   updateCartCount();
   renderCart();
 }
 
 function updateCartCount() {
-  const total = cart.reduce((s, i) => s + i.qty, 0);
-  document.getElementById('cart-count').textContent = total;
+  document.getElementById('cart-count').textContent = cart.reduce(function(s, i){ return s + i.qty; }, 0);
 }
 
 function cartTotal() {
-  return cart.reduce((s, i) => s + i.price * i.qty, 0);
+  return cart.reduce(function(s, i){ return s + i.price * i.qty; }, 0);
 }
 
 function renderCart() {
-  const el = document.getElementById('cart-content');
+  var el = document.getElementById('cart-content');
   if (!cart.length) {
-    el.innerHTML = `<div class="cart-empty"><div class="big">🛒</div><p>Your cart is empty</p></div>`;
+    el.innerHTML = '<div class="cart-empty"><div class="big">🛒</div><p>Your cart is empty</p></div>';
     return;
   }
-  const rows = cart.map(i => `
-    <tr>
-      <td style="font-size:28px">${i.emoji}</td>
-      <td><div class="cart-item-name">${i.name}</div><div class="cart-item-brand">${i.brand}</div></td>
-      <td>₹${i.price.toLocaleString()}</td>
-      <td>${i.qty}</td>
-      <td>₹${(i.price * i.qty).toLocaleString()}</td>
-      <td><button class="remove-btn" onclick="removeFromCart('${i.id}')">✕</button></td>
-    </tr>`).join('');
-  const total = cartTotal();
-  el.innerHTML = `
-    <table class="cart-table">
-      <thead><tr><th></th><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div class="cart-summary">
-      <div class="coupon-row">
-        <input class="coupon-input" type="text" id="coupon" placeholder="Enter coupon code" />
-        <button class="coupon-apply" onclick="applyCoupon()">Apply</button>
-      </div>
-      <div class="summary-row"><span>Subtotal</span><span>₹${total.toLocaleString()}</span></div>
-      <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>
-      <div class="summary-row total"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
-      <button class="checkout-btn" onclick="showPage('checkout')">Proceed to Checkout →</button>
-    </div>`;
+  var rows = cart.map(function(i){
+    return '<tr>' +
+      '<td style="font-size:28px">' + i.emoji + '</td>' +
+      '<td><div class="cart-item-name">' + i.name + '</div><div class="cart-item-brand">' + i.brand + '</div></td>' +
+      '<td>₹' + i.price.toLocaleString() + '</td>' +
+      '<td>' + i.qty + '</td>' +
+      '<td>₹' + (i.price * i.qty).toLocaleString() + '</td>' +
+      '<td><button class="remove-btn" onclick="removeFromCart(\'' + i.id + '\')">✕</button></td>' +
+      '</tr>';
+  }).join('');
+  var total = cartTotal();
+  el.innerHTML =
+    '<table class="cart-table"><thead><tr><th></th><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<div class="cart-summary">' +
+      '<div class="coupon-row"><input class="coupon-input" type="text" id="coupon" placeholder="Enter coupon code" /><button class="coupon-apply" onclick="applyCoupon()">Apply</button></div>' +
+      '<div class="summary-row"><span>Subtotal</span><span>₹' + total.toLocaleString() + '</span></div>' +
+      '<div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>' +
+      '<div class="summary-row total"><span>Total</span><span>₹' + total.toLocaleString() + '</span></div>' +
+      '<button class="checkout-btn" onclick="showPage(\'checkout\')">Proceed to Checkout →</button>' +
+    '</div>';
 }
 
 function applyCoupon() {
-  const code = document.getElementById('coupon').value.trim();
+  var code = document.getElementById('coupon').value.trim();
+  console.log('[dataLayer] 🏷️ coupon_applied:', code);
   pushDL({ event: 'coupon_applied', coupon_code: code, cart_value: cartTotal() });
 }
 
 function renderCheckoutSummary() {
-  document.getElementById('checkout-items').innerHTML = cart.map(i =>
-    `<div class="order-item"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>₹${(i.price*i.qty).toLocaleString()}</span></div>`
-  ).join('');
-  document.getElementById('checkout-total').textContent = `₹${cartTotal().toLocaleString()}`;
+  document.getElementById('checkout-items').innerHTML = cart.map(function(i){
+    return '<div class="order-item"><span>' + i.emoji + ' ' + i.name + ' ×' + i.qty + '</span><span>₹' + (i.price*i.qty).toLocaleString() + '</span></div>';
+  }).join('');
+  document.getElementById('checkout-total').textContent = '₹' + cartTotal().toLocaleString();
 }
 
+function fireAddPaymentInfo(paymentType) {
+  if (!paymentType) return;
+  console.log('[dataLayer] 💳 add_payment_info:', paymentType);
+  pushDL({ event: 'add_payment_info', ecommerce: { currency: 'INR', value: cartTotal(), payment_type: paymentType, items: cart.map(function(i){ return buildItem(i, i.qty); }) } });
+}
+
+// EVENT C: purchase (from full checkout flow)
 function placeOrder() {
-  const orderId = 'ORD-' + Math.random().toString(36).substring(2,9).toUpperCase();
-  const total = cartTotal();
-  const items = cart.map(i => ({ ...gaItem(i), quantity: i.qty }));
+  var transactionId = generateTransactionId();
+  var total = cartTotal();
+  var items = cart.map(function(i){ return buildItem(i, i.qty); });
+
+  console.log('[dataLayer] 🎉 purchase — transaction_id:', transactionId, '| value:', total);
+  console.log('[dataLayer] purchase items:', items);
+
   pushDL({
     event: 'purchase',
-    transaction_id: orderId,
-    affiliation: 'ShopLab Demo Store',
-    value: total,
-    tax: Math.round(total * 0.18),
-    shipping: 0,
-    currency: 'INR',
-    coupon: '',
-    items
+    ecommerce: {
+      transaction_id: transactionId,
+      affiliation:    'ShopLab Demo Store',
+      value:          total,
+      tax:            Math.round(total * 0.18),
+      shipping:       0,
+      currency:       'INR',
+      coupon:         '',
+      items:          items
+    }
   });
+
   cart = [];
   updateCartCount();
-  document.getElementById('order-id').textContent = orderId;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('order-id').textContent = transactionId;
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-confirmation').classList.add('active');
 }
 
-// =====================================================================
-//  GA4 STANDARD EVENTS
-// =====================================================================
-function fireViewItemList(items) {
-  pushDL({ event: 'view_item_list', item_list_id: 'all_products', item_list_name: 'All Products', items: items.slice(0,8).map(gaItem) });
+function fireViewItemList(items, listName) {
+  console.log('[dataLayer] 📋 view_item_list:', listName, '| items:', items.length);
+  pushDL({
+    event: 'view_item_list',
+    ecommerce: {
+      item_list_id:   listName,
+      item_list_name: listName,
+      items: items.slice(0,8).map(function(p, i){ return buildItem(p, 1, i); })
+    }
+  });
 }
 
 function fireViewCart() {
   if (!cart.length) return;
-  pushDL({ event: 'view_cart', currency: 'INR', value: cartTotal(), items: cart.map(i => ({ ...gaItem(i), quantity: i.qty })) });
+  console.log('[dataLayer] 🛒 view_cart | total:', cartTotal());
+  pushDL({ event: 'view_cart', ecommerce: { currency: 'INR', value: cartTotal(), items: cart.map(function(i){ return buildItem(i, i.qty); }) } });
 }
 
 function fireBeginCheckout() {
-  pushDL({ event: 'begin_checkout', currency: 'INR', value: cartTotal(), items: cart.map(i => ({ ...gaItem(i), quantity: i.qty })) });
+  console.log('[dataLayer] 💰 begin_checkout | total:', cartTotal());
+  pushDL({ event: 'begin_checkout', ecommerce: { currency: 'INR', value: cartTotal(), items: cart.map(function(i){ return buildItem(i, i.qty); }) } });
 }
 
-// =====================================================================
-//  SEARCH
-// =====================================================================
 function handleSearch(val) {
   clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    const filtered = PRODUCTS.filter(p =>
-      p.name.toLowerCase().includes(val.toLowerCase()) ||
-      p.brand.toLowerCase().includes(val.toLowerCase()) ||
-      p.category.toLowerCase().includes(val.toLowerCase())
-    );
-    document.getElementById('products-grid').innerHTML = filtered.map(p => productCard(p, 'search')).join('') || '<p style="color:var(--muted)">No results found.</p>';
+  searchTimeout = setTimeout(function() {
+    var filtered = PRODUCTS.filter(function(p){
+      return p.name.toLowerCase().indexOf(val.toLowerCase()) > -1 ||
+             p.brand.toLowerCase().indexOf(val.toLowerCase()) > -1 ||
+             p.category.toLowerCase().indexOf(val.toLowerCase()) > -1;
+    });
+    document.getElementById('products-grid').innerHTML =
+      filtered.map(function(p){ return productCard(p, 'search'); }).join('') ||
+      '<p style="color:var(--muted)">No results found.</p>';
     if (val.trim()) {
+      console.log('[dataLayer] 🔍 search:', val, '| results:', filtered.length);
       pushDL({ event: 'search', search_term: val.trim(), results_count: filtered.length });
     }
   }, 600);
 }
 
 // =====================================================================
-//  GA4 ITEM SCHEMA HELPER
-// =====================================================================
-function gaItem(p, index = 0) {
-  return {
-    item_id: p.id,
-    item_name: p.name,
-    affiliation: 'ShopLab',
-    item_brand: p.brand,
-    item_category: p.category,
-    price: p.price,
-    currency: 'INR',
-    index
-  };
-}
-
-// =====================================================================
 //  INIT
 // =====================================================================
-document.addEventListener('DOMContentLoaded', () => {
-  // Route to the correct page based on current URL hash
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[ShopLab] 🚀 App initialized | GTM: GTM-MGVPFTRP');
   navigateToHash(location.hash, false);
-
-  // Show GTM status badge
-  var cfg = JSON.parse(localStorage.getItem('shoplab_gtm_config') || '{}');
-  var badge = document.getElementById('gtm-status-badge');
-  if (cfg.gtmId) {
-    badge.textContent = '✅ ' + cfg.gtmId;
-    badge.style.background = '#0f2e1a';
-    badge.style.color = '#4ade80';
-    badge.style.border = '1px solid #1a4a2a';
-  } else {
-    badge.textContent = '⚠️ No GTM ID';
-    badge.style.background = '#2a1f00';
-    badge.style.color = '#f0c040';
-    badge.style.border = '1px solid #3a2f00';
-  }
 });
 </script>
 </body>
